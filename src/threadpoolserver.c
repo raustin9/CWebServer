@@ -37,13 +37,14 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024
 #define THREAD_POOL_SIZE 20
+#define CACHE_SIZE 20
 
 /// GLOBALS ///
-tpool_t* thread_pool;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
-queue_t* queue;
-
+queue_t* queue;       // queue for incoming and pending requests
+char *file_cache[20]; // cache of requested file names for quick lookup
+tpool_t* thread_pool; // thread pool that handles the requests on the queue
 
 /// PROTOTYPES ///
 int CreateSocket();
@@ -57,7 +58,7 @@ void ServerStartup();
 // char* ParseURI(char* req_uri);
 char* CreateFilePath(char* directory, char* name);
 char* GetContentType(char* file_name);
-
+int CheckCache(char* file_name);
 
 
 // Creates a socket to listen to
@@ -463,6 +464,19 @@ char* GetContentType(char* file_name) {
 
   free(file_extension);
   return content_type;
+}
+
+// Check for a file name in the cache
+int CheckCache(char* file_name) {
+  int i;
+
+  for (i = 0; i < CACHE_SIZE; i++) {
+    if (strcmp(file_name, file_cache[i]) == 0) {
+      return i;
+    }
+  }
+
+  return -1;
 }
 
 /// MAIN ///
