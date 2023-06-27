@@ -55,17 +55,10 @@ char* ReadFromFile(char* file_name);
 request_t* ParseRequest(const char* request);
 void* ThreadFunction();
 void ServerStartup();
-void GracefulExit();
 char* ParseURI(char* req_uri);
 char* CreateFilePath(char* directory, char* name);
 char* GetContentType(char* file_name);
 
-// Exit the server
-void
-GracefulExit() {
-  PrintLog("Exiting");
-  return;
-}
 
 
 // Creates a socket to listen to
