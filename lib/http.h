@@ -9,7 +9,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "request.h"
+// #include "request.h"
+
+
+// Information from HTTP Request
+typedef struct HTTPRequestData {
+  char* Method;
+  char* URI;
+  char* Version;
+} request_t;
+
 
 #define BUFFER_SIZE 1024
 // Gets the status message based on the status code

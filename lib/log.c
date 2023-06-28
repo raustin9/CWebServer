@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "request.h"
+#include "http.h"
 
 // Gets the time and formats it properly to use
 // with the log

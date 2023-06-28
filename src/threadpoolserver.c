@@ -31,8 +31,8 @@
 #include "queue.h"
 
 #include "log.c"
-#include "request.h"
-#include "HTTPhelpers.c"
+// #include "request.h"
+#include "http.h"
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
