@@ -1,0 +1,4 @@
+Current Metrics:
+Time for 500 requests: ~1.61 seconds total
+Time per request:      ~0.00322 seconds per request
+Requests per second:   ~310.55 requests per second
