@@ -165,9 +165,10 @@ HandleConnection(const int fd) {
   close(fd);
   free(ReqInfo);
 
-  free(req->Method);
-  free(req->Version);
-  free(req->URI);
+//  free(req->Method);
+//  free(req->Version);
+//  free(req->URI);
+  FreeRequest(req);
   free(req);
   
   free(buffer);

@@ -21,6 +21,14 @@ typedef struct HTTPRequestData {
 
 
 #define BUFFER_SIZE 1024
+
+void
+FreeRequest(request_t* req) {
+  free(req->Method);
+  free(req->URI);
+  free(req->Version);
+}
+
 // Gets the status message based on the status code
 // ex: 200 => "200 OK"
 char*
