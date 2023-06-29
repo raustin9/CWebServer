@@ -74,16 +74,20 @@ GetStatusMsg(int status) {
 // Generetes and HTTP response based on the status code and desired response body
 char*
 CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size) {
-  char *headers, *body;
+  char *headers, *body, *content_len;
   char* statusmsg;
   uint64_t header_size;
 
+  content_len = (char*)calloc(30, sizeof(char));
+  sprintf(content_len, "%lu", body_size);
+
   statusmsg = GetStatusMsg(status);
   header_size = (
-      strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type: ")
+      strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Length: \r\nContent-Type: \r\n")
     + strlen(content_type)+1+4
     + body_size+1 
     + strlen(statusmsg)+1
+    + strlen(content_len)
     + 20
   );
 
@@ -101,8 +105,10 @@ CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_si
     headers,
     "HTTP/1.1 %s\r\n"
     "Server: webserver-c\r\n"
+    "Content-Length: %s"
     "Content-Type: %s\r\n\r\n",
     statusmsg,
+    content_len,
     content_type
   );
 
@@ -112,9 +118,9 @@ CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_si
   memcpy(body+length, resp_data, body_size);
 //  printf("headers:\n%s\n", headers);
 //  printf("body: \n%s\n", body);
+ 
   free(headers);
-
-
+  free(content_len);
   free(statusmsg); 
   return body;
 }

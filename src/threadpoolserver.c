@@ -155,7 +155,7 @@ HandleConnection(const int fd) {
   }
 
   // Write to the socket
-  int valwrite = write(fd, resp, strlen(resp));
+  int valwrite = write(fd, resp, strlen(resp)+file_size - strlen(file_content));
   if (valwrite < 0) {
     perror("webserver (write)");
     return NULL;
