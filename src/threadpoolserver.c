@@ -44,6 +44,7 @@ pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
 queue_t* queue;       // queue for incoming and pending requests
 char *file_cache[20]; // cache of requested file names for quick lookup
 tpool_t* thread_pool; // thread pool that handles the requests on the queue
+queue_t* file_name_cache;
 
 /// PROTOTYPES ///
 int CreateSocket();
@@ -304,6 +305,7 @@ void
 ServerStartup() {
   thread_pool = ThreadPoolInit(THREAD_POOL_SIZE, ThreadFunction);
   queue = QueueInit();
+  file_name_cache = QueueInit();
 
   // Initialize thread pool
   ThreadPoolStart(thread_pool, NULL);
