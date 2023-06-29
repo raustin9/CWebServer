@@ -49,10 +49,10 @@ queue_t* file_name_cache;
 /// PROTOTYPES ///
 int CreateSocket();
 struct sockaddr_in CreateHost(int port);
-char* CreateResponse(int status, char* resp_data, char* content_type);
+char* CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size);
 void* HandleConnection(int newfd);
 int BindAndListen(int socketfd, int port);
-char* ReadFromFile(char* file_name);
+char* ReadFromFile(char* file_name, int* file_size);
 void* ThreadFunction();
 void ServerStartup();
 char* CreateFilePath(char* directory, char* name);
@@ -132,25 +132,26 @@ HandleConnection(const int fd) {
   ReqInfo = realloc(ReqInfo, strlen(ReqInfo)+1);
   PrintLog(ReqInfo);
 
+  int file_size = 0;
   // Grab correct file based on request
   if (strcmp(req->URI, "/") == 0) {
-    file_content = ReadFromFile("files/index.html");
-    resp = CreateResponse(200, file_content, "text/html");
+    file_content = ReadFromFile("files/index.html", &file_size);
+    resp = CreateResponse(200, file_content, "text/html", file_size);
   } else if (req->URI[0] == '/' && strlen(req->URI) > 1) {
     char *file_path, *file_name, *content_type;
     file_name = ParseURI(req->URI);
     file_path = CreateFilePath("files/", file_name);
     content_type = GetContentType(file_name);
     
-    file_content = ReadFromFile(file_path);
-    resp = CreateResponse(200, file_content, content_type);
+    file_content = ReadFromFile(file_path, &file_size);
+    resp = CreateResponse(200, file_content, content_type, file_size);
   
     free(content_type);
     free(file_name);
     free(file_path);
   } else {
     file_content = strdup("Invalid file request");
-    resp = CreateResponse(404, file_content, "text/plain");
+    resp = CreateResponse(404, file_content, "text/plain", strlen(file_content)+1);
   }
 
   // Write to the socket
@@ -217,7 +218,7 @@ BindAndListen(int socketfd, int port) {
 // This should be used to read from 
 // a file asked for in an HTTP request
 char*
-ReadFromFile(char* file_name) {
+ReadFromFile(char* file_name, int* fsize) {
   FILE *fp;
   long file_size;
   char* buf;
@@ -248,6 +249,7 @@ ReadFromFile(char* file_name) {
     return buf;
   }
   rewind(fp);
+  *fsize = file_size;
 
   // Allocate memory for the buffer
   // with size of the file

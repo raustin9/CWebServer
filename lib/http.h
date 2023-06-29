@@ -7,6 +7,7 @@
 
 #pragma once
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 // #include "request.h"
@@ -72,33 +73,50 @@ GetStatusMsg(int status) {
 
 // Generetes and HTTP response based on the status code and desired response body
 char*
-CreateResponse(int status, char* resp_data, char* content_type) {
-  char* rv;
+CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size) {
+  char *headers, *body;
   char* statusmsg;
+  uint64_t header_size;
 
   statusmsg = GetStatusMsg(status);
-
-  rv = (char*)malloc(
-    (strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type: ")
+  header_size = (
+      strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type: ")
     + strlen(content_type)+1+4
-    + strlen(resp_data)+1 
+    + body_size+1 
     + strlen(statusmsg)+1
-    + 20) * sizeof(char)
+    + 20
   );
 
-  sprintf(
-    rv, 
+  headers  = (char*)calloc(
+    sizeof(char),
+    header_size
+  );
+
+  body = (char*)calloc(
+    sizeof(char),
+    header_size
+  );
+
+  uint64_t length = sprintf(
+    headers,
     "HTTP/1.1 %s\r\n"
     "Server: webserver-c\r\n"
-    "Content-Type: %s\r\n\r\n"
-    "%s\r\n\r\n",
+    "Content-Type: %s\r\n\r\n",
     statusmsg,
-    content_type,
-    resp_data
+    content_type
   );
 
+  // memcpy magic for files that have 
+  // null terminators in them like images
+  memcpy(body, headers, length);
+  memcpy(body+length, resp_data, body_size);
+//  printf("headers:\n%s\n", headers);
+//  printf("body: \n%s\n", body);
+  free(headers);
+
+
   free(statusmsg); 
-  return rv;
+  return body;
 }
 
 
