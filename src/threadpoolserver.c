@@ -52,7 +52,7 @@ struct sockaddr_in CreateHost(int port);
 char* CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size);
 void* HandleConnection(int newfd);
 int BindAndListen(int socketfd, int port);
-char* ReadFromFile(char* file_name, int* file_size);
+char* ReadFromFile(char* file_name, uint64_t* file_size);
 void* ThreadFunction();
 void ServerStartup();
 char* CreateFilePath(char* directory, char* name);
@@ -132,7 +132,7 @@ HandleConnection(const int fd) {
   ReqInfo = realloc(ReqInfo, strlen(ReqInfo)+1);
   PrintLog(ReqInfo);
 
-  int file_size = 0;
+  uint64_t file_size = 0;
   // Grab correct file based on request
   if (strcmp(req->URI, "/") == 0) {
     file_content = ReadFromFile("files/index.html", &file_size);
@@ -217,8 +217,11 @@ BindAndListen(int socketfd, int port) {
 // Reads the text from a file
 // This should be used to read from 
 // a file asked for in an HTTP request
+// Params:
+//  file_name: name of the file to read from
+//  fsize: pointer to integer that we will set the size of the file to
 char*
-ReadFromFile(char* file_name, int* fsize) {
+ReadFromFile(char* file_name, uint64_t* fsize) {
   FILE *fp;
   long file_size;
   char* buf;

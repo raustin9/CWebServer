@@ -72,6 +72,11 @@ GetStatusMsg(int status) {
 
 
 // Generetes and HTTP response based on the status code and desired response body
+// Params:
+//  status       -- status code for HTTP response: 200 OK or 404 NOT FOUND
+//  resp_data    -- body data for the http response
+//  content_type -- content type header for response: text/html or application/json
+//  body_size    -- amount of bytes for the response body
 char*
 CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size) {
   char *headers, *body, *content_len;
