@@ -159,6 +159,7 @@ HandleConnection(const int fd) {
     perror("webserver (write)");
     return NULL;
   }
+  
   close(fd);
   free(ReqInfo);
 
@@ -210,6 +211,7 @@ BindAndListen(int socketfd, int port) {
 
   return 1;
 }
+
 
 // Reads the text from a file
 // This should be used to read from 

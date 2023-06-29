@@ -79,7 +79,7 @@ CreateResponse(int status, char* resp_data, char* content_type) {
   statusmsg = GetStatusMsg(status);
 
   rv = (char*)malloc(
-    (strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type:")
+    (strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type: ")
     + strlen(content_type)+1+4
     + strlen(resp_data)+1 
     + strlen(statusmsg)+1
@@ -90,8 +90,8 @@ CreateResponse(int status, char* resp_data, char* content_type) {
     rv, 
     "HTTP/1.1 %s\r\n"
     "Server: webserver-c\r\n"
-    "Content-Type%s\r\n\r\n"
-    "%s\r\n",
+    "Content-Type: %s\r\n\r\n"
+    "%s\r\n\r\n",
     statusmsg,
     content_type,
     resp_data

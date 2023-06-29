@@ -58,11 +58,11 @@ LRUInit(uint64_t capacity) {
 // the LRU
 // If the string is already in the LRU, move that node to the front and shift the rest
 cnode_t*
-LRUInsertString(lru_t* lru, char* data) {
+PutString(lru_t* lru, char* data) {
   cnode_t* cur = lru->Head;
 
-  for (cur = lru->Head; cur != NULL || cur != lru->Rear; cur = cur->Next) {
-    printf("%s\n", cur->Data);
+  if (lru->Size < lru->Capacity) {
+    
   }
 }
 
