@@ -226,6 +226,7 @@ ReadFromFile(char* file_name, uint64_t* fsize) {
   long file_size;
   char* buf;
 
+  // Check if file exists
   if (access(file_name, F_OK) != 0) {
     PrintLog("Cannot find file");
     buf = (char*)malloc(strlen("FILE DOES NOT EXIST")+1);
@@ -233,6 +234,7 @@ ReadFromFile(char* file_name, uint64_t* fsize) {
     return buf;
   }
 
+  // Open file and check if successful
   fp = fopen(file_name, "rb");
   if (fp == NULL) {
     perror("webserver (ReadFile)");
