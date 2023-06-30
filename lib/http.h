@@ -7,6 +7,7 @@
 
 #pragma once
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 // #include "request.h"
@@ -71,34 +72,62 @@ GetStatusMsg(int status) {
 
 
 // Generetes and HTTP response based on the status code and desired response body
+// Params:
+//  status       -- status code for HTTP response: 200 OK or 404 NOT FOUND
+//  resp_data    -- body data for the http response
+//  content_type -- content type header for response: text/html or application/json
+//  body_size    -- amount of bytes for the response body
 char*
-CreateResponse(int status, char* resp_data, char* content_type) {
-  char* rv;
+CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size) {
+  char *headers, *body, *content_len;
   char* statusmsg;
+  uint64_t header_size;
+
+  content_len = (char*)calloc(30, sizeof(char));
+  sprintf(content_len, "%lu", body_size);
 
   statusmsg = GetStatusMsg(status);
-
-  rv = (char*)malloc(
-    (strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Type: ")
+  header_size = (
+      strlen("HTTP/1.1 %s\r\nServer: webserver-c\r\nContent-Length: \r\nContent-Type: \r\n")
     + strlen(content_type)+1+4
-    + strlen(resp_data)+1 
+    + body_size+1 
     + strlen(statusmsg)+1
-    + 20) * sizeof(char)
+    + strlen(content_len)
+    + 20
   );
 
-  sprintf(
-    rv, 
+  headers  = (char*)calloc(
+    sizeof(char),
+    header_size
+  );
+
+  body = (char*)calloc(
+    sizeof(char),
+    header_size
+  );
+
+  uint64_t length = sprintf(
+    headers,
     "HTTP/1.1 %s\r\n"
     "Server: webserver-c\r\n"
-    "Content-Type: %s\r\n\r\n"
-    "%s\r\n\r\n",
+    "Content-Length: %s"
+    "Content-Type: %s\r\n\r\n",
     statusmsg,
-    content_type,
-    resp_data
+    content_len,
+    content_type
   );
 
+  // memcpy magic for files that have 
+  // null terminators in them like images
+  memcpy(body, headers, length);
+  memcpy(body+length, resp_data, body_size);
+//  printf("headers:\n%s\n", headers);
+//  printf("body: \n%s\n", body);
+ 
+  free(headers);
+  free(content_len);
   free(statusmsg); 
-  return rv;
+  return body;
 }
 
 
