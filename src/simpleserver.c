@@ -23,6 +23,7 @@ sigchld_handler(int s) {
   errno = saved_errno;
 }
 
+// Return whether or not it is IPv4 or IPv6
 void*
 get_in_addr(struct sockaddr *sa) {
   if (sa->sa_family == AF_INET) {
@@ -30,6 +31,36 @@ get_in_addr(struct sockaddr *sa) {
   }
 
   return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+// Bind socket to first address available 
+// to the desired socket
+int
+bind_addr(struct addrinfo *serverinfo, struct addrinfo *p) {
+  int yes = 1, sockfd;
+
+  // loop through all results and bind to the first that we can
+  for (p = serverinfo; p != NULL; p = p->ai_next) {
+    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+      perror("server: (socket)");
+      continue;
+    }
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+      perror("server (setsockopt)");
+      exit(1);
+    }
+
+    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+      close(sockfd);
+      perror("server (bind)");
+      continue;
+    }
+
+    break;
+  }
+
+  return sockfd;
 }
 
 int
@@ -54,26 +85,7 @@ main(void) {
   }
 
   // loop through all results and bind to the first that we can
-  for (p = servinfo; p != NULL; p = p->ai_next) {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("server: (socket)");
-      continue;
-    }
-
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-      perror("server (setsockopt)");
-      exit(1);
-    }
-
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-      close(sockfd);
-      perror("server (bind)");
-      continue;
-    }
-
-    break;
-  }
-
+  sockfd = bind_addr(servinfo, p);
   freeaddrinfo(servinfo);
 
   if (p == NULL) {
