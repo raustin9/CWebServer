@@ -1,28 +1,39 @@
 CC=gcc
-CFLAGS=-Wall -pthread -g
-EXECUTABLES= bin/poolserver bin/multiserver
-OBJS=obj/pool.o
-INCLUDE=-I include/ -I lib/
+CFLAGS=-Wall -g
 BIN=bin/
+SRC=src/
+EXECUTABLES=bin/showip bin/socket bin/simpleserver
+SHOWIP=showip
+SOCKET=socket
+SERVER=simpleserver
 
-all:$(EXECUTABLES)
+all: $(EXECUTABLES)
 
 clean:
 	rm -f obj/* bin/*
 
-pool: bin/poolserver
+showip: bin/$(SHOWIP)
 
-bin/poolserver: obj/pool.o
-	$(CC) $(CFLAGS) -o bin/poolserver obj/pool.o 
+bin/showip: obj/showip.o
+	$(CC) $(CFLAGS) -o bin/$(SHOWIP) obj/$(SHOWIP).o
 
-obj/pool.o: src/threadpoolserver.c
-	$(CC) $(CFLAGS) $(INCLUDE) -o obj/pool.o -c src/threadpoolserver.c
+obj/showip.o: src/$(SHOWIP).c
+	$(CC) $(CFLAGS) -o obj/showip.o -c src/$(SHOWIP).c
 
 
-multi: bin/multiserver
+socket: bin/$(SOCKET)
 
-bin/multiserver: obj/multi.o
-	$(CC) $(CFLAGS) -o bin/multiserver obj/multi.o
+bin/$(SOCKET): obj/$(SOCKET).o
+	$(CC) $(CFLAGS) -o bin/$(SOCKET) obj/$(SOCKET).o
 
-obj/multi.o:
-	$(CC) $(CFLAGS) $(INCLUDE) -o obj/multi.o -c src/multithreadserver.c
+obj/$(SOCKET).o: src/$(SOCKET).c
+	$(CC) $(CFLAGS) -o obj/$(SOCKET).o -c src/$(SOCKET).c
+
+
+server: bin/$(SERVER)
+
+bin/$(SERVER): obj/$(SERVER).o
+	$(CC) $(CFLAGS) -o bin/$(SERVER) obj/$(SERVER).o
+
+obj/$(SERVER).o: src/$(SERVER).c
+	$(CC) $(CFLAGS) -o obj/$(SERVER).o -c src/$(SERVER).c

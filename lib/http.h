@@ -10,8 +10,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-// #include "request.h"
-
 
 // Information from HTTP Request
 typedef struct HTTPRequestData {
@@ -20,9 +18,17 @@ typedef struct HTTPRequestData {
   char* Version;
 } request_t;
 
+// Structure for an HTTP response
+// REFACTOR TO INCLUDE METHODS THAT WILL CONSTRUCT THE RESPOSNE MODULARLY
+typedef struct HTTPResponse {
+  char* Text;    // the text sent in the response
+  uint64_t Size; // the amount of bytes the response is
+} response_t;
 
 #define BUFFER_SIZE 1024
 
+// Free the memory in the request struct
+// Destructor for HTTPRequestData struct
 void
 FreeRequest(request_t* req) {
   free(req->Method);
@@ -78,7 +84,9 @@ GetStatusMsg(int status) {
 //  content_type -- content type header for response: text/html or application/json
 //  body_size    -- amount of bytes for the response body
 char*
+//response_t*
 CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_size) {
+  response_t* resp = (response_t*)malloc(sizeof(response_t)); // response to return
   char *headers, *body, *content_len;
   char* statusmsg;
   uint64_t header_size;
@@ -127,6 +135,8 @@ CreateResponse(int status, char* resp_data, char* content_type, uint64_t body_si
   free(headers);
   free(content_len);
   free(statusmsg); 
+
+  
   return body;
 }
 
