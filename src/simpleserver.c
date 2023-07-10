@@ -14,12 +14,6 @@
 #define PORT "8080"
 #define BACKLOG 10
 
-// Structure for the server
-struct Server { 
-  int Port;    // port the server will listen on
-  int Backlog; // the backlog of connections for the queue
-};
-
 // Clean up zombie processes
 void
 sigchld_handler(int s) {
