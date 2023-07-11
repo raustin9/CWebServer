@@ -1,16 +1,18 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -Iutils
 BIN=bin/
 SRC=src/
+OBJS=obj/serverutils.o
 EXECUTABLES=bin/showip bin/socket bin/simpleserver
 SHOWIP=showip
 SOCKET=socket
 SERVER=simpleserver
+UTILS=-I utils/
 
 all: $(EXECUTABLES)
 
 clean:
-	rm -f obj/* bin/*
+	rm -f obj/* bin/* lib/*
 
 showip: bin/$(SHOWIP)
 
@@ -30,10 +32,15 @@ obj/$(SOCKET).o: src/$(SOCKET).c
 	$(CC) $(CFLAGS) -o obj/$(SOCKET).o -c src/$(SOCKET).c
 
 
+# Compile the server
 server: bin/$(SERVER)
 
-bin/$(SERVER): obj/$(SERVER).o
-	$(CC) $(CFLAGS) -o bin/$(SERVER) obj/$(SERVER).o
+bin/$(SERVER): src/$(SERVER).c lib/serverutils.a
+	$(CC) $(CFLAGS)  -o $@ $< lib/serverutils.a
 
-obj/$(SERVER).o: src/$(SERVER).c
-	$(CC) $(CFLAGS) -o obj/$(SERVER).o -c src/$(SERVER).c
+lib/serverutils.a: obj/serverutils.o
+	ar ru $@ $<
+	ranlib $@
+
+obj/serverutils.o: utils/serverutils.c
+	$(CC) $(CFLAGS) -c -o obj/serverutils.o utils/serverutils.c

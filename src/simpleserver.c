@@ -11,8 +11,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "8080"
-#define BACKLOG 10
+#include "serverutils.h"
 
 // Clean up zombie processes
 void
@@ -34,86 +33,7 @@ get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-// Bind socket to first address available 
-// to the desired socket
-// returns the file descriptor of the socket that was binded
-int
-bind_addr(struct addrinfo *serverinfo, struct addrinfo *p) {
-  int yes = 1, sockfd;
 
-  // loop through all results and bind to the first that we can
-  for (p = serverinfo; p != NULL; p = p->ai_next) {
-    // Create socket from the address
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("server: (socket)");
-      continue;
-    }
-
-    // Allow reuse of the socket
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-      perror("server (setsockopt)");
-      exit(1);
-    }
-
-    // Attemp to bind, and if successful break the loop
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-      close(sockfd);
-      perror("server (bind)");
-      continue;
-    }
-
-    break;
-  }
-
-  return sockfd;
-}
-
-struct addrinfo*
-get_server_address() {
-  int err;
-  struct addrinfo hints, *serverinfo;
-
-  // Create server address
-  memset(&hints, 0, sizeof(hints));
-  hints.ai_family = AF_UNSPEC;     // Hande both IPv4 and IPv6
-  hints.ai_socktype = SOCK_STREAM; // Use TCP sockets rather than UDP
-  hints.ai_flags = AI_PASSIVE;     
-
-  if ((err = getaddrinfo(NULL, PORT, &hints, &serverinfo)) != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err));
-    return NULL;
-  }
-
-  return serverinfo;
-}
-
-// bind the socket
-int
-bind_and_listen() {
-  struct addrinfo *serverinfo, *p;
-  int sockfd; // file descriptor of listening socket 
-
-  p = calloc(1, sizeof(struct addrinfo));
-  serverinfo = get_server_address();
-
-  // loop through all results and bind to the first that we can
-  sockfd = bind_addr(serverinfo, p);
-
-  if (p == NULL) {
-    fprintf(stderr, "server: failed to bind\n");
-    exit(1);
-  }
-  freeaddrinfo(serverinfo);
-
-  if (listen(sockfd, BACKLOG) == -1) {
-    perror("server (listen)");
-    exit(1);
-  }
-  free(p);
-  printf("server: listening on 8080\n");
-
-  return sockfd;
-}
 
 // Receive a message from specified file descriptor
 char*
@@ -196,9 +116,16 @@ handle_connections(int sockfd) {
 
 int
 main(void) {
+  server_t *server;
+//  server = (server_t*)calloc(1, sizeof(server_t));
+//  server->Port = strdup("8080");
+//  server->Backlog = 20;
+
+  server = server_create("8080", 20);
+
   int sockfd;                         // file descriptor to listen on 
 
-  sockfd = bind_and_listen();
+  sockfd = bind_and_listen(server);
 
   handle_connections(sockfd);
 
