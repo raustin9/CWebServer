@@ -33,8 +33,6 @@ get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-
-
 // Receive a message from specified file descriptor
 char*
 receive(int fd) {
@@ -51,16 +49,20 @@ receive(int fd) {
 }
 
 // Process the incoming request
-void process_request(int sockfd, int conn_fd, char* req) {
+void 
+process_request(int sockfd, int conn_fd, char* req) {
   char *msg = strdup("Hello, world!");
   if (send(conn_fd, msg, strlen(msg), 0) == -1) {
     perror("send");
   }
+
+  printf("%s\n", req);
   
   free(msg);
   return;
 }
 
+// Handle the incoming requests
 void
 handle_connections(int sockfd) {
   struct sockaddr_storage their_addr; // connector's address information
@@ -111,23 +113,17 @@ handle_connections(int sockfd) {
     close(new_fd);
     free(buffer);
   }
-
 }
 
 int
 main(void) {
-  server_t *server;
-//  server = (server_t*)calloc(1, sizeof(server_t));
-//  server->Port = strdup("8080");
-//  server->Backlog = 20;
+  int sockfd;       // file descriptor to listen on 
+  server_t *server; // Server details
 
   server = server_create("8080", 20);
-
-  int sockfd;                         // file descriptor to listen on 
-
   sockfd = bind_and_listen(server);
 
-  handle_connections(sockfd);
+  handle_connections(sockfd); // handle connections on the socket
 
   return 0;
 }
