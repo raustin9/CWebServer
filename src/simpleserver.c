@@ -12,6 +12,7 @@
 #include <signal.h>
 
 #include "serverutils.h"
+#include "httputils.h"
 
 // Clean up zombie processes
 void
@@ -51,13 +52,19 @@ receive(int fd) {
 // Process the incoming request
 void 
 process_request(int sockfd, int conn_fd, char* req) {
+  request_t *r = new_http_request(req);
   char *msg = strdup("Hello, world!");
   if (send(conn_fd, msg, strlen(msg), 0) == -1) {
     perror("send");
   }
+ 
+  // Test if request was created properly
+  if (r != NULL)
+  {
+    printf("REQUEST:\n%s %s %s\n", r->Method, r->Version, r->URI);
+  }
 
-  printf("%s\n", req);
-  
+  free_http_request(r);
   free(msg);
   return;
 }
@@ -96,22 +103,22 @@ handle_connections(int sockfd) {
     printf("server: got connection from %s\n", s);
  
     // Receive message from connection
-    char* buffer = receive(new_fd);
-    if (buffer == NULL) {
+    char* request = receive(new_fd);
+    if (request == NULL) {
       continue;
     }
-    printf("------------\n%s\n------------\n", buffer);
+    printf("%s", request);
 
     if (fork() == 0) {
       // Child process
       close(sockfd);
-      process_request(sockfd, new_fd, buffer);
-      free(buffer);
+      process_request(sockfd, new_fd, request);
+      free(request);
       close(new_fd);
       exit(0);
     }
     close(new_fd);
-    free(buffer);
+    free(request);
   }
 }
 

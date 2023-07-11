@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifndef UTILS
-#define UTILS
+#ifndef UTILS_
+#define UTILS_
 
 
 
-#endif /* UTILS */
+#endif /* UTILS_ */

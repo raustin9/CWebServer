@@ -7,7 +7,7 @@ EXECUTABLES=bin/showip bin/socket bin/simpleserver
 SHOWIP=showip
 SOCKET=socket
 SERVER=simpleserver
-UTILS=-I utils/
+LIB=lib/serverutils.a lib/httputils.a
 
 all: $(EXECUTABLES)
 
@@ -35,12 +35,21 @@ obj/$(SOCKET).o: src/$(SOCKET).c
 # Compile the server
 server: bin/$(SERVER)
 
-bin/$(SERVER): src/$(SERVER).c lib/serverutils.a
-	$(CC) $(CFLAGS)  -o $@ $< lib/serverutils.a
+bin/$(SERVER): src/$(SERVER).c $(LIB)
+	$(CC) $(CFLAGS)  -o $@ $< $(LIB)
 
+# Library for server utilities
 lib/serverutils.a: obj/serverutils.o
 	ar ru $@ $<
 	ranlib $@
 
 obj/serverutils.o: utils/serverutils.c
 	$(CC) $(CFLAGS) -c -o obj/serverutils.o utils/serverutils.c
+
+# Library for http utilities
+lib/httputils.a: obj/httputils.o
+	ar ru $@ $<
+	ranlib $@
+
+obj/httputils.o: utils/httputils.c
+	$(CC) $(CFLAGS) -c -o obj/httputils.o utils/httputils.c
