@@ -1,99 +1,96 @@
-==2234139== Memcheck, a memory error detector
-==2234139== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
-==2234139== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
-==2234139== Command: bin/simpleserver
-==2234139== Parent PID: 2221266
-==2234139== 
-==2234142== 
-==2234142== HEAP SUMMARY:
-==2234142==     in use at exit: 10 bytes in 1 blocks
-==2234142==   total heap usage: 16 allocs, 15 frees, 7,455 bytes allocated
-==2234142== 
-==2234142== 10 bytes in 1 blocks are definitely lost in loss record 1 of 1
-==2234142==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2234142==    by 0x4EE768D: strdup (strdup.c:42)
-==2234142==    by 0x401038: process_request (simpleserver.c:104)
-==2234142==    by 0x401256: handle_connections (simpleserver.c:183)
-==2234142==    by 0x4012D2: main (simpleserver.c:201)
-==2234142== 
-==2234142== LEAK SUMMARY:
-==2234142==    definitely lost: 10 bytes in 1 blocks
-==2234142==    indirectly lost: 0 bytes in 0 blocks
-==2234142==      possibly lost: 0 bytes in 0 blocks
-==2234142==    still reachable: 0 bytes in 0 blocks
-==2234142==         suppressed: 0 bytes in 0 blocks
-==2234142== 
-==2234142== For lists of detected and suppressed errors, rerun with: -s
-==2234142== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
-==2234145== 
-==2234145== HEAP SUMMARY:
-==2234145==     in use at exit: 10 bytes in 1 blocks
-==2234145==   total heap usage: 17 allocs, 16 frees, 8,479 bytes allocated
-==2234145== 
-==2234145== 10 bytes in 1 blocks are definitely lost in loss record 1 of 1
-==2234145==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2234145==    by 0x4EE768D: strdup (strdup.c:42)
-==2234145==    by 0x401038: process_request (simpleserver.c:104)
-==2234145==    by 0x401256: handle_connections (simpleserver.c:183)
-==2234145==    by 0x4012D2: main (simpleserver.c:201)
-==2234145== 
-==2234145== LEAK SUMMARY:
-==2234145==    definitely lost: 10 bytes in 1 blocks
-==2234145==    indirectly lost: 0 bytes in 0 blocks
-==2234145==      possibly lost: 0 bytes in 0 blocks
-==2234145==    still reachable: 0 bytes in 0 blocks
-==2234145==         suppressed: 0 bytes in 0 blocks
-==2234145== 
-==2234145== For lists of detected and suppressed errors, rerun with: -s
-==2234145== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
-==2234139== 
-==2234139== Process terminating with default action of signal 2 (SIGINT)
-==2234139==    at 0x4F77348: accept (accept.c:26)
-==2234139==    by 0x40118C: handle_connections (simpleserver.c:159)
-==2234139==    by 0x4012D2: main (simpleserver.c:201)
-==2234139== 
-==2234139== HEAP SUMMARY:
-==2234139==     in use at exit: 2,605 bytes in 4 blocks
-==2234139==   total heap usage: 10 allocs, 6 frees, 5,329 bytes allocated
-==2234139== 
-==2234139== 5 bytes in 1 blocks are still reachable in loss record 1 of 4
-==2234139==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2234139==    by 0x4EE768D: strdup (strdup.c:42)
-==2234139==    by 0x401313: server_create (serverutils.c:20)
-==2234139==    by 0x4012AE: main (simpleserver.c:198)
-==2234139== 
-==2234139== 16 bytes in 1 blocks are still reachable in loss record 2 of 4
-==2234139==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
-==2234139==    by 0x401303: server_create (serverutils.c:18)
-==2234139==    by 0x4012AE: main (simpleserver.c:198)
-==2234139== 
-==2234139== 1,024 bytes in 1 blocks are still reachable in loss record 3 of 4
-==2234139==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2234139==    by 0x4ECDD3F: _IO_file_doallocate (filedoalloc.c:101)
-==2234139==    by 0x4EDBCAF: _IO_doallocbuf (genops.c:347)
-==2234139==    by 0x4EDAF17: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:749)
-==2234139==    by 0x4EDA0BE: UnknownInlinedFun (fileops.c:1248)
-==2234139==    by 0x4EDA0BE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1201)
-==2234139==    by 0x4ED0182: puts (ioputs.c:40)
-==2234139==    by 0x40158E: bind_and_listen (serverutils.c:114)
-==2234139==    by 0x4012BE: main (simpleserver.c:199)
-==2234139== 
-==2234139== 1,560 bytes in 1 blocks are still reachable in loss record 4 of 4
-==2234139==    at 0x4C3804F: malloc (vg_replace_malloc.c:380)
-==2234139==    by 0x4C3D0F2: realloc (vg_replace_malloc.c:1437)
-==2234139==    by 0x4F93239: make_request (check_pf.c:235)
-==2234139==    by 0x4F93239: __check_pf (check_pf.c:329)
-==2234139==    by 0x4F61B28: getaddrinfo (getaddrinfo.c:2320)
-==2234139==    by 0x4013AA: get_server_address (serverutils.c:48)
-==2234139==    by 0x4014F7: bind_and_listen (serverutils.c:98)
-==2234139==    by 0x4012BE: main (simpleserver.c:199)
-==2234139== 
-==2234139== LEAK SUMMARY:
-==2234139==    definitely lost: 0 bytes in 0 blocks
-==2234139==    indirectly lost: 0 bytes in 0 blocks
-==2234139==      possibly lost: 0 bytes in 0 blocks
-==2234139==    still reachable: 2,605 bytes in 4 blocks
-==2234139==         suppressed: 0 bytes in 0 blocks
-==2234139== 
-==2234139== For lists of detected and suppressed errors, rerun with: -s
-==2234139== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==2259852== Memcheck, a memory error detector
+==2259852== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==2259852== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==2259852== Command: bin/simpleserver
+==2259852== Parent PID: 2257761
+==2259852== 
+==2259861== Invalid write of size 1
+==2259861==    at 0x4C42334: memmove (vg_replace_strmem.c:1382)
+==2259861==    by 0x401E01: create_http_response_string (httputils.c:158)
+==2259861==    by 0x40150A: process_request (simpleserver.c:143)
+==2259861==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259861==    by 0x401767: main (simpleserver.c:228)
+==2259861==  Address 0x522e000 is 0 bytes after a block of size 1,024 alloc'd
+==2259861==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2259861==    by 0x401DAC: create_http_response_string (httputils.c:146)
+==2259861==    by 0x40150A: process_request (simpleserver.c:143)
+==2259861==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259861==    by 0x401767: main (simpleserver.c:228)
+==2259861== 
+==2259861== Syscall param socketcall.sendto(msg) points to unaddressable byte(s)
+==2259861==    at 0x4F776D1: send (send.c:28)
+==2259861==    by 0x4011F7: send_data (simpleserver.c:39)
+==2259861==    by 0x401527: process_request (simpleserver.c:144)
+==2259861==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259861==    by 0x401767: main (simpleserver.c:228)
+==2259861==  Address 0x522e000 is 0 bytes after a block of size 1,024 alloc'd
+==2259861==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2259861==    by 0x401DAC: create_http_response_string (httputils.c:146)
+==2259861==    by 0x40150A: process_request (simpleserver.c:143)
+==2259861==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259861==    by 0x401767: main (simpleserver.c:228)
+==2259861== 
+==2259861== 
+==2259861== HEAP SUMMARY:
+==2259861==     in use at exit: 0 bytes in 0 blocks
+==2259861==   total heap usage: 27 allocs, 27 frees, 133,325 bytes allocated
+==2259861== 
+==2259861== All heap blocks were freed -- no leaks are possible
+==2259861== 
+==2259861== For lists of detected and suppressed errors, rerun with: -s
+==2259861== ERROR SUMMARY: 57087 errors from 2 contexts (suppressed: 0 from 0)
+==2259872== Invalid write of size 1
+==2259872==    at 0x4C42334: memmove (vg_replace_strmem.c:1382)
+==2259872==    by 0x401E01: create_http_response_string (httputils.c:158)
+==2259872==    by 0x40150A: process_request (simpleserver.c:143)
+==2259872==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259872==    by 0x401767: main (simpleserver.c:228)
+==2259872==  Address 0x522e440 is 0 bytes after a block of size 1,024 alloc'd
+==2259872==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2259872==    by 0x401DAC: create_http_response_string (httputils.c:146)
+==2259872==    by 0x40150A: process_request (simpleserver.c:143)
+==2259872==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259872==    by 0x401767: main (simpleserver.c:228)
+==2259872== 
+==2259872== Syscall param socketcall.sendto(msg) points to unaddressable byte(s)
+==2259872==    at 0x4F776D1: send (send.c:28)
+==2259872==    by 0x4011F7: send_data (simpleserver.c:39)
+==2259872==    by 0x401527: process_request (simpleserver.c:144)
+==2259872==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259872==    by 0x401767: main (simpleserver.c:228)
+==2259872==  Address 0x522e440 is 0 bytes after a block of size 1,024 alloc'd
+==2259872==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2259872==    by 0x401DAC: create_http_response_string (httputils.c:146)
+==2259872==    by 0x40150A: process_request (simpleserver.c:143)
+==2259872==    by 0x4016EB: handle_connections (simpleserver.c:210)
+==2259872==    by 0x401767: main (simpleserver.c:228)
+==2259872== 
+==2259872== 
+==2259872== HEAP SUMMARY:
+==2259872==     in use at exit: 0 bytes in 0 blocks
+==2259872==   total heap usage: 28 allocs, 28 frees, 134,349 bytes allocated
+==2259872== 
+==2259872== All heap blocks were freed -- no leaks are possible
+==2259872== 
+==2259872== For lists of detected and suppressed errors, rerun with: -s
+==2259872== ERROR SUMMARY: 57087 errors from 2 contexts (suppressed: 0 from 0)
+==2259852== 
+==2259852== Process terminating with default action of signal 2 (SIGINT)
+==2259852==    at 0x4F77348: accept (accept.c:26)
+==2259852==    by 0x40163B: handle_connections (simpleserver.c:186)
+==2259852==    by 0x401767: main (simpleserver.c:228)
+==2259852== 
+==2259852== HEAP SUMMARY:
+==2259852==     in use at exit: 2,605 bytes in 4 blocks
+==2259852==   total heap usage: 10 allocs, 6 frees, 5,329 bytes allocated
+==2259852== 
+==2259852== LEAK SUMMARY:
+==2259852==    definitely lost: 0 bytes in 0 blocks
+==2259852==    indirectly lost: 0 bytes in 0 blocks
+==2259852==      possibly lost: 0 bytes in 0 blocks
+==2259852==    still reachable: 2,605 bytes in 4 blocks
+==2259852==         suppressed: 0 bytes in 0 blocks
+==2259852== Rerun with --leak-check=full to see details of leaked memory
+==2259852== 
+==2259852== For lists of detected and suppressed errors, rerun with: -s
+==2259852== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

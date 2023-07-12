@@ -105,12 +105,10 @@ process_request(int sockfd, int conn_fd, char *request)
   char *msg2 = strdup("Message 2");
 
 
-  size_t len = strlen(msg);
-  size_t len2 = strlen(msg2);
-  char size[20];
   char *response_string;
-
   file_t *file;
+  char *file_name;
+  char *file_path = strdup("files/");
 
   switch (validate_uri(req))
   {
@@ -119,16 +117,14 @@ process_request(int sockfd, int conn_fd, char *request)
       
       file = read_file("files/index.html");
 
-      sprintf(size, "%zu", len);
       set_http_response_header(res, "Status", "200 OK");
-      set_http_response_body(res, msg, strlen(msg));
+      set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
-      len = strlen(response_string);
-      printf("file: %zu\n%s\n", file->Size, file->Data);
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
       }
+
       free_file(file);
       break;
     case 2:
@@ -136,15 +132,23 @@ process_request(int sockfd, int conn_fd, char *request)
       // API calll
       break;
     case 3:
-      sprintf(size, "%zu", len2);
+      // Respond with requested file
+      file_name = get_file_name(req->URI);
+      file_path = (char*)realloc(file_path, strlen(file_path)+strlen(file_name)+1);
+      strcat(file_path, file_name);
+      file = read_file(file_path);
+
       set_http_response_header(res, "Status", "200 OK");
-      set_http_response_body(res, msg2, len2);
+      set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
-      // Normal file request
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
       }
+
+      free_file(file);
+      free(file_name);
+      free(file_path);
       break;
     default:
       // wtf
