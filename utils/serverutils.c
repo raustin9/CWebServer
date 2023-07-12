@@ -14,11 +14,12 @@
 
 // Generate a new server with desired parameters
 server_t*
-server_create(char* port, int backlog) {
+server_create(const char* port, int backlog, const char *file_source) {
   server_t* s = (server_t*)calloc(1, sizeof(server_t));
 
   s->Port = strdup(port);
   s->Backlog = backlog;
+  s->File_Source = strdup(file_source);
 
   return s;
 }

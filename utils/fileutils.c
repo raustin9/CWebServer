@@ -97,3 +97,28 @@ free_file(file_t *file)
   free(file->Data);
   free(file);
 }
+
+// Creates the file path for a specified file
+// -- path: files/
+// -- name: index.html
+// --> files/index.html
+char*
+create_file_path(char* dirname, char* file_name)
+{
+  char* full_path;
+
+  full_path = (char*)calloc(
+    strlen(dirname) +
+    strlen("/") +
+    strlen(file_name) +
+    1,
+    sizeof(char)
+  );
+
+  memcpy(full_path, dirname, strlen(dirname));
+  memset(full_path+strlen(dirname), '/', 1);
+  memcpy(full_path+strlen(dirname)+strlen("/"), file_name, strlen(file_name));
+  memset(full_path+strlen(dirname)+strlen("/")+strlen(file_name), '\0', 1);
+
+  return full_path;
+}

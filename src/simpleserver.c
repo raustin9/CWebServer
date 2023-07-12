@@ -97,7 +97,7 @@ validate_uri(request_t *req)
 // Handle the logic for processing
 // a connection
 void
-process_request(int sockfd, int conn_fd, char *request) 
+process_request(const server_t *server, int sockfd, int conn_fd, char *request) 
 {
   request_t *req = new_http_request(request);
   response_t *res = new_http_response();
@@ -107,16 +107,17 @@ process_request(int sockfd, int conn_fd, char *request)
 
   char *response_string;
   file_t *file;
-  char *file_name;
-  char *file_path = strdup("files/");
+  char *file_name, *file_path;
+  // char *file_path = strdup("files/");
 
   switch (validate_uri(req))
   {
     case 1:
       // Respond with index.html
+      file_name = strdup("index.html");
+      file_path = create_file_path(server->File_Source, file_name);
+      file = read_file(file_path);
       
-      file = read_file("files/index.html");
-
       set_http_response_header(res, "Status", "200 OK");
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
@@ -134,13 +135,13 @@ process_request(int sockfd, int conn_fd, char *request)
     case 3:
       // Respond with requested file
       file_name = get_file_name(req->URI);
-      file_path = (char*)realloc(file_path, strlen(file_path)+strlen(file_name)+1);
-      strcat(file_path, file_name);
+      file_path = create_file_path(server->File_Source, file_name);
       file = read_file(file_path);
-
+ 
       set_http_response_header(res, "Status", "200 OK");
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
+ 
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
@@ -207,7 +208,7 @@ handle_connections(server_t *server, int sockfd) {
       // Child process
       close(sockfd);
       server_free(server);
-      process_request(sockfd, new_fd, request);
+      process_request(server, sockfd, new_fd, request);
       free(request);
       close(new_fd);
       exit(0);
@@ -222,7 +223,7 @@ main(void) {
   int sockfd;       // file descriptor to listen on 
   server_t *server; // Server details
 
-  server = server_create("8080", 20);
+  server = server_create("8080", 20, "files");
   sockfd = bind_and_listen(server);
 
   handle_connections(server, sockfd); // handle connections on the socket
