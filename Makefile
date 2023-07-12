@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g -Iutils
+CFLAGS=-Wall -g -Iutils -Iinclude -pthread
 BIN=bin/
 SRC=src/
 OBJS=obj/serverutils.o
@@ -36,7 +36,7 @@ obj/$(SOCKET).o: src/$(SOCKET).c
 server: bin/$(SERVER)
 
 bin/$(SERVER): src/$(SERVER).c $(LIB)
-	$(CC) $(CFLAGS)  -o $@ $< $(LIB)
+	$(CC) $(CFLAGS) -o $@ $< $(LIB)
 
 # Library for server utilities
 lib/serverutils.a: obj/serverutils.o

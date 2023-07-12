@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,6 +15,16 @@
 #include "serverutils.h"
 #include "httputils.h"
 #include "fileutils.h"
+#include "queue.h"
+#include "threadpool.h"
+
+#define THREAD_POOL_SIZE 10
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
+queue_t *queue;
+tpool_t *thread_pool;
+
 
 // Return whether or not it is IPv4 or IPv6
 void*
@@ -80,7 +91,7 @@ validate_uri(request_t *req)
 {
   int result;
 
-  if (strncmp(req->URI, "/", 1) == 0) {
+  if (strcmp(req->URI, "/") == 0) {
     // Assume it is browser asking for index.html
     result = 1;
   } else if (strncmp(req->URI, "/api", 4) == 0) {
@@ -201,6 +212,12 @@ handle_connections(server_t *server, int sockfd) {
         sizeof(s));
     printf("server: got connection from %s\n", s);
  
+    pthread_mutex_lock(&mutex);
+    QueuePush(queue, (void*)&new_fd);
+    pthread_cond_signal(&condition_var);
+    pthread_mutex_unlock(&mutex);
+
+    /* FOR FORKING PROCESSES
     // Receive message from connection
     char* request = receive(new_fd);
     if (request == NULL) {
@@ -219,19 +236,63 @@ handle_connections(server_t *server, int sockfd) {
     }
     close(new_fd);
     free(request);
+    */
   }
+}
+
+void*
+thread_function(void* args)
+{
+  server_t *server = (server_t*)args;
+  while(1)
+  {
+    qnode_t *node;
+    node = NULL;
+    pthread_mutex_lock(&mutex);
+
+    if ((node = QueuePop(queue)) == NULL)
+    {
+      pthread_cond_wait(&condition_var, &mutex);
+      node = QueuePop(queue);
+    }
+    pthread_mutex_unlock(&mutex);
+
+    if (node != NULL)
+    {
+      // logic for request
+      int fd = *(int*)node->Data;
+      char *request = receive(fd);
+      if (request == NULL)
+      {
+        perror("webserver (receive)");
+      }
+
+      process_request(server, 0, fd, request);
+      free(request);
+      close(fd);
+      free(node);
+      node = NULL;
+    }
+  }
+  return NULL;
 }
 
 int
 main(void) {
   int sockfd;       // file descriptor to listen on 
   server_t *server; // Server details
+  
+  queue = QueueInit();
+  thread_pool = ThreadPoolInit(THREAD_POOL_SIZE, thread_function);
 
   server = server_create("8080", 20, "files");
   sockfd = bind_and_listen(server);
 
+  ThreadPoolStart(thread_pool, (void*)server);
+
   handle_connections(server, sockfd); // handle connections on the socket
 
   server_free(server);
+  QueueFree(queue);
   return 0;
 }
