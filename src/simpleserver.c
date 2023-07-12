@@ -80,10 +80,10 @@ validate_uri(request_t *req)
 {
   int result;
 
-  if (strcmp(req->URI, "/") == 0) {
+  if (strncmp(req->URI, "/", 1) == 0) {
     // Assume it is browser asking for index.html
     result = 1;
-  } else if (strcmp(req->URI, "/api") == 0) {
+  } else if (strncmp(req->URI, "/api", 4) == 0) {
     // API call rather than file request
     result = 2;
   } else {
@@ -101,9 +101,6 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
 {
   request_t *req = new_http_request(request);
   response_t *res = new_http_response();
-  char *msg = strdup("Hello world");
-  char *msg2 = strdup("Message 2");
-
 
   char *response_string;
   file_t *file;
@@ -165,8 +162,6 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       break;
   }
 
-  free(msg);
-  free(msg2);
   free(response_string);
   free_http_request(req);
   free_http_response(res);
