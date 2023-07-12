@@ -107,7 +107,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
 
   char *response_string;
   file_t *file;
-  char *file_name, *file_path;
+  char *file_name, *file_path, *content_type;
   // char *file_path = strdup("files/");
 
   switch (validate_uri(req))
@@ -117,16 +117,22 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       file_name = strdup("index.html");
       file_path = create_file_path(server->File_Source, file_name);
       file = read_file(file_path);
+      content_type = get_content_type(file_name);
       
       set_http_response_header(res, "Status", "200 OK");
+      set_http_response_header(res, "Content-Type", content_type);
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
+
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
       }
 
       free_file(file);
+      free(file_name);
+      free(file_path);
+      free(content_type);
       break;
     case 2:
       response_string = create_http_response_string(res);
@@ -137,8 +143,10 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       file_name = get_file_name(req->URI);
       file_path = create_file_path(server->File_Source, file_name);
       file = read_file(file_path);
+      content_type = get_content_type(file_name);
  
       set_http_response_header(res, "Status", "200 OK");
+      set_http_response_header(res, "Content-Type", content_type);
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
  
@@ -150,6 +158,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       free_file(file);
       free(file_name);
       free(file_path);
+      free(content_type);
       break;
     default:
       // wtf
@@ -207,8 +216,8 @@ handle_connections(server_t *server, int sockfd) {
     if (fork() == 0) {
       // Child process
       close(sockfd);
-      server_free(server);
       process_request(server, sockfd, new_fd, request);
+      server_free(server);
       free(request);
       close(new_fd);
       exit(0);

@@ -30,6 +30,7 @@ void
 server_free(server_t* server) 
 {
   free(server->Port);
+  free(server->File_Source);
   free(server);
 }
 
