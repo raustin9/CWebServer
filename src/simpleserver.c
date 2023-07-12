@@ -18,7 +18,7 @@
 #include "queue.h"
 #include "threadpool.h"
 
-#define THREAD_POOL_SIZE 10
+#define THREAD_POOL_SIZE 20
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
