@@ -29,6 +29,7 @@ typedef struct HTTP_Request {
 typedef struct HTTP_Response {
   headers_t Headers;
   body_t Body;
+  size_t String_Size;
 } response_t;
 
 

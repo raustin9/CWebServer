@@ -13,6 +13,7 @@
 
 #include "serverutils.h"
 #include "httputils.h"
+#include "fileutils.h"
 
 // Return whether or not it is IPv4 or IPv6
 void*
@@ -26,7 +27,7 @@ get_in_addr(struct sockaddr *sa) {
 
 // Ensure all data in the buffer is sent
 int
-send_data(int conn_fd, char *data, int *len)
+send_data(int conn_fd, char *data, size_t *len)
 {
   int total, bytes_left, n;
 
@@ -104,32 +105,43 @@ process_request(int sockfd, int conn_fd, char *request)
   char *msg2 = strdup("Message 2");
 
 
-  int len = strlen(msg);
-  int len2 = strlen(msg2);
+  size_t len = strlen(msg);
+  size_t len2 = strlen(msg2);
   char size[20];
   char *response_string;
+
+  file_t *file;
+
   switch (validate_uri(req))
   {
     case 1:
       // Respond with index.html
-      sprintf(size, "%d", len);
+      
+      file = read_file("files/index.html");
+
+      sprintf(size, "%zu", len);
       set_http_response_header(res, "Status", "200 OK");
       set_http_response_body(res, msg, strlen(msg));
       response_string = create_http_response_string(res);
-      printf("status: %s\nlength: %s\nresponse:\n%s\n", res->Headers.Status, res->Headers.Content_Length, response_string);
-      if (send_data(conn_fd, res->Body.Data, &len) == -1) 
+      len = strlen(response_string);
+      printf("file: %zu\n%s\n", file->Size, file->Data);
+      if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
       }
+      free_file(file);
       break;
     case 2:
       response_string = create_http_response_string(res);
       // API calll
       break;
     case 3:
+      sprintf(size, "%zu", len2);
+      set_http_response_header(res, "Status", "200 OK");
+      set_http_response_body(res, msg2, len2);
       response_string = create_http_response_string(res);
       // Normal file request
-      if (send_data(conn_fd, msg2, &len2) == -1) 
+      if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
       }

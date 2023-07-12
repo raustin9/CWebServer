@@ -43,6 +43,8 @@ new_http_response()
   response_t* res;
   res = (response_t*)calloc(1, sizeof(response_t));
 
+  res->String_Size = 0;
+
   res->Headers.Status = NULL;
   res->Headers.Content_Length = NULL;
 
@@ -154,6 +156,7 @@ create_http_response_string(response_t *res)
   // Use memcpy to account for null terminators
   // inside the body
   memcpy(response_string+headers_length, res->Body.Data, res->Body.Data_Size);
+  res->String_Size = headers_length + res->Body.Data_Size;
 
   return response_string;
 }

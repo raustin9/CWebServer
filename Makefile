@@ -7,7 +7,7 @@ EXECUTABLES=bin/showip bin/socket bin/simpleserver
 SHOWIP=showip
 SOCKET=socket
 SERVER=simpleserver
-LIB=lib/serverutils.a lib/httputils.a
+LIB=lib/serverutils.a lib/httputils.a lib/fileutils.a
 
 all: $(EXECUTABLES)
 
@@ -53,3 +53,11 @@ lib/httputils.a: obj/httputils.o
 
 obj/httputils.o: utils/httputils.c
 	$(CC) $(CFLAGS) -c -o obj/httputils.o utils/httputils.c
+
+# Library for file utilities
+lib/fileutils.a: obj/fileutils.o
+	ar ru $@ $<
+	ranlib $@
+
+obj/fileutils.o: utils/fileutils.c
+	$(CC) $(CFLAGS) -c -o obj/fileutils.o utils/fileutils.c
