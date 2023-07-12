@@ -61,6 +61,7 @@ free_http_response(response_t *res)
 {
   free(res->Headers.Status);
   free(res->Headers.Content_Length);
+  free(res->Headers.Content_Type);
 
   free(res->Body.Data);
 
@@ -116,6 +117,8 @@ set_http_response_body(response_t *res, const char *data, size_t size)
 
 // Set the header of an HTTP response
 // to the desired data
+// return 1 if successful
+// return -1 on error
 int
 set_http_response_header(response_t *res, const char *header, char *data)
 {
@@ -127,7 +130,11 @@ set_http_response_header(response_t *res, const char *header, char *data)
   } else if (strcmp(header, "Content-Length") == 0) {
     res->Headers.Content_Length = strdup(data);
     result = 1;
-  } else {
+  } else if (strcmp(header, "Content-Type") == 0) {
+    res->Headers.Content_Type = strdup(data);
+    result = 1;
+  }
+  else {
     result = -1;
   }
 
@@ -148,8 +155,10 @@ create_http_response_string(response_t *res)
     response_string,
     "HTTP/1.1 %s\r\n"
     "Server: c-webserver\r\n"
+    "Content-Type: %s\r\n"
     "Content-Length: %s\r\n\r\n",
     res->Headers.Status,
+    res->Headers.Content_Type,
     res->Headers.Content_Length
   );
 
@@ -159,4 +168,12 @@ create_http_response_string(response_t *res)
   res->String_Size = headers_length + res->Body.Data_Size;
 
   return response_string;
+}
+
+// Get the correct MIME type for each
+// file extension
+char*
+get_content_type(char *file_ext)
+{
+  return strdup("text/plain");
 }
