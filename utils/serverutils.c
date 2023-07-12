@@ -6,6 +6,11 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 // Generate a new server with desired parameters
 server_t*
@@ -17,6 +22,16 @@ server_create(char* port, int backlog) {
 
   return s;
 }
+
+// Free the memembers of the server
+// along with the server itself
+void 
+server_free(server_t* server) 
+{
+  free(server->Port);
+  free(server);
+}
+
 
 // Get the information for the server
 struct addrinfo*
@@ -100,3 +115,5 @@ bind_and_listen(server_t* server) {
 
   return sockfd;
 }
+
+
