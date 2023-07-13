@@ -270,8 +270,9 @@ thread_function(void* args)
   {
     qnode_t *node;
     node = NULL;
-    pthread_mutex_lock(&mutex);
 
+    // Wait for connection to get pushed on the queue
+    pthread_mutex_lock(&mutex);
     if ((node = QueuePop(queue)) == NULL)
     {
       pthread_cond_wait(&condition_var, &mutex);
@@ -279,6 +280,8 @@ thread_function(void* args)
     }
     pthread_mutex_unlock(&mutex);
 
+    // If it got a connection
+    // handle it
     if (node != NULL)
     {
       // logic for request
@@ -302,20 +305,27 @@ thread_function(void* args)
   return NULL;
 }
 
+void
+startup()
+{
+  queue = QueueInit();
+  thread_pool = ThreadPoolInit(THREAD_POOL_SIZE, thread_function);
+
+}
+
 int
 main(void) {
   int sockfd;       // file descriptor to listen on 
   server_t *server; // Server details
-  
-  queue = QueueInit();
-  thread_pool = ThreadPoolInit(THREAD_POOL_SIZE, thread_function);
+ 
+  (void)startup();
 
   server = server_create("8080", 20, "files");
   sockfd = bind_and_listen(server);
 
-  ThreadPoolStart(thread_pool, (void*)server);
+  (void)ThreadPoolStart(thread_pool, (void*)server);
 
-  handle_connections(server, sockfd); // handle connections on the socket
+  (void)handle_connections(server, sockfd); // handle connections on the socket
 
   server_free(server);
   QueueFree(queue);

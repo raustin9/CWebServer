@@ -6,3 +6,5 @@ obj/*
 
 lib/*
 !lib/.keep
+
+val.txt
