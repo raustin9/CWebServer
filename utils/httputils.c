@@ -151,7 +151,7 @@ create_http_response_string(response_t *res)
   char *response_string;
   long int headers_length;
 
-  response_string = (char*)calloc(1024, sizeof(char));
+  response_string = (char*)calloc(1024+res->Body.Data_Size, sizeof(char));
   headers_length = sprintf(
     response_string,
     "HTTP/1.0 %s\r\n"

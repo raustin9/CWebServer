@@ -55,8 +55,8 @@ read_file(char* file_name)
   stat(file_name, &st);
   file_size = st.st_size;
 
-//  // Seek to end of file and read how far in
-//  // to get number of bytes to read
+  // Seek to end of file and read how far in
+  // to get number of bytes to read
 //  fseek(fp, 0L, SEEK_END);
 //  file_size = ftell(fp);
 //  if (file_size < 0)
