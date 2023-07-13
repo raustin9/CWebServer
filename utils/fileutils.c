@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 // This string takes in the uri from an http request
 // and strips the file name from it
@@ -23,6 +24,8 @@ read_file(char* file_name)
   FILE *fp;
   size_t file_size;
 
+  struct stat st;
+
   // Initialze the file struct
   file = (file_t*)calloc(1, sizeof(file_t));
   file->Size = 0;
@@ -37,6 +40,7 @@ read_file(char* file_name)
     return file;
   }
 
+
   // Open file
   fp = fopen(file_name, "rb");
   if (fp == NULL)
@@ -48,19 +52,23 @@ read_file(char* file_name)
     return file;
   }
 
-  // Seek to end of file and read how far in
-  // to get number of bytes to read
-  fseek(fp, 0L, SEEK_END);
-  file_size = ftell(fp);
-  if (file_size < 0)
-  {
-    fclose(fp);
-    perror("read_file (ftell)");
-    file->Data = NULL;
-    file->Size = 0;
-    return file;
-  }
-  rewind(fp);
+  stat(file_name, &st);
+  file_size = st.st_size;
+
+//  // Seek to end of file and read how far in
+//  // to get number of bytes to read
+//  fseek(fp, 0L, SEEK_END);
+//  file_size = ftell(fp);
+//  if (file_size < 0)
+//  {
+//    fclose(fp);
+//    perror("read_file (ftell)");
+//    file->Data = NULL;
+//    file->Size = 0;
+//    return file;
+//  }
+//  rewind(fp);
+  fseek(fp, 0L, SEEK_SET);
   
   file->Size = file_size;
 
