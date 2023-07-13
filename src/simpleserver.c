@@ -74,6 +74,7 @@ receive(int fd) {
     char *buffer = (char*)calloc(1024, sizeof(char));
     int valread = recv(fd, buffer, 1024, 0);
     if (valread == -1) {
+      free(buffer);
       perror("recv");
       close(fd);
       return NULL;
@@ -265,6 +266,7 @@ thread_function(void* args)
       if (request == NULL)
       {
         perror("webserver (receive)");
+        continue;
       }
 
       process_request(server, 0, fd, request);
