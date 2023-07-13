@@ -154,7 +154,7 @@ create_http_response_string(response_t *res)
   response_string = (char*)calloc(1024, sizeof(char));
   headers_length = sprintf(
     response_string,
-    "HTTP/1.1 %s\r\n"
+    "HTTP/1.0 %s\r\n"
     "Server: c-webserver\r\n"
     "Connection: close\r\n"
     "Content-Type: %s\r\n"
