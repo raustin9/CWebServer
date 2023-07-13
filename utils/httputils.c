@@ -157,7 +157,7 @@ create_http_response_string(response_t *res)
     "HTTP/1.0 %s\r\n"
     "Server: c-webserver\r\n"
     "Connection: close\r\n"
-    "Content-Type: %s\r\n"
+    "Content-Type: %s; charset=UTF-8\r\n"
     "Content-Length: %s\r\n\r\n",
     res->Headers.Status,
     res->Headers.Content_Type,
