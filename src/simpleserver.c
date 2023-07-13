@@ -116,7 +116,7 @@ validate_uri(request_t *req)
   if (strcmp(req->URI, "/") == 0) {
     // Assume it is browser asking for index.html
     result = 1;
-  } else if (strncmp(req->URI, "/api", 4) == 0) {
+  } else if (strcmp(req->URI, "/api") == 0) {
     // API call rather than file request
     result = 2;
   } else {
@@ -314,13 +314,23 @@ startup()
 }
 
 int
-main(void) {
+main(int argc, char** argv) {
   int sockfd;       // file descriptor to listen on 
   server_t *server; // Server details
+  char *port, *file_source;
+  
+  if (argc < 3)
+  {
+    fprintf(stderr, "usage: <port> <dir_source>\n");
+    return 1;
+  }
+
+  port = strdup(argv[1]);
+  file_source = strdup(argv[2]);
  
   (void)startup();
 
-  server = server_create("8080", 20, "files");
+  server = server_create(port, 20, file_source);
   sockfd = bind_and_listen(server);
 
   (void)ThreadPoolStart(thread_pool, (void*)server);

@@ -1,91 +1,101 @@
-==2494118== Memcheck, a memory error detector
-==2494118== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
-==2494118== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
-==2494118== Command: bin/simpleserver
-==2494118== Parent PID: 2494117
-==2494118== 
-==2494118== 
-==2494118== Process terminating with default action of signal 2 (SIGINT)
-==2494118==    at 0x4E59BD7: accept (accept.c:26)
-==2494118==    by 0x401C0B: handle_connections (simpleserver.c:224)
-==2494118==    by 0x401E2A: main (simpleserver.c:328)
-==2494118== 
-==2494118== HEAP SUMMARY:
-==2494118==     in use at exit: 8,267 bytes in 28 blocks
-==2494118==   total heap usage: 53 allocs, 25 frees, 24,493 bytes allocated
-==2494118== 
-==2494118== 5 bytes in 1 blocks are still reachable in loss record 1 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x510768D: strdup (strdup.c:42)
-==2494118==    by 0x401E7E: server_create (serverutils.c:20)
-==2494118==    by 0x401DF0: main (simpleserver.c:323)
-==2494118== 
-==2494118== 6 bytes in 1 blocks are still reachable in loss record 2 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x510768D: strdup (strdup.c:42)
-==2494118==    by 0x401E9E: server_create (serverutils.c:22)
-==2494118==    by 0x401DF0: main (simpleserver.c:323)
-==2494118== 
-==2494118== 24 bytes in 1 blocks are still reachable in loss record 3 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x4013D7: QueueInit (queue.h:27)
-==2494118==    by 0x401DAA: startup (simpleserver.c:311)
-==2494118==    by 0x401DDC: main (simpleserver.c:321)
-==2494118== 
-==2494118== 24 bytes in 1 blocks are still reachable in loss record 4 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x40159B: ThreadPoolInit (threadpool.h:39)
-==2494118==    by 0x401DC0: startup (simpleserver.c:312)
-==2494118==    by 0x401DDC: main (simpleserver.c:321)
-==2494118== 
-==2494118== 24 bytes in 1 blocks are still reachable in loss record 5 of 9
-==2494118==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
-==2494118==    by 0x401E6E: server_create (serverutils.c:18)
-==2494118==    by 0x401DF0: main (simpleserver.c:323)
-==2494118== 
-==2494118== 160 bytes in 1 blocks are still reachable in loss record 6 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x4015B7: ThreadPoolInit (threadpool.h:42)
-==2494118==    by 0x401DC0: startup (simpleserver.c:312)
-==2494118==    by 0x401DDC: main (simpleserver.c:321)
-==2494118== 
-==2494118== 1,024 bytes in 1 blocks are still reachable in loss record 7 of 9
-==2494118==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
-==2494118==    by 0x50EDD3F: _IO_file_doallocate (filedoalloc.c:101)
-==2494118==    by 0x50FBCAF: _IO_doallocbuf (genops.c:347)
-==2494118==    by 0x50FAF17: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:749)
-==2494118==    by 0x50FA0BE: UnknownInlinedFun (fileops.c:1248)
-==2494118==    by 0x50FA0BE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1201)
-==2494118==    by 0x50F0182: puts (ioputs.c:40)
-==2494118==    by 0x402120: bind_and_listen (serverutils.c:116)
-==2494118==    by 0x401E00: main (simpleserver.c:324)
-==2494118== 
-==2494118== 1,560 bytes in 1 blocks are still reachable in loss record 8 of 9
-==2494118==    at 0x4C3804F: malloc (vg_replace_malloc.c:380)
-==2494118==    by 0x4C3D0F2: realloc (vg_replace_malloc.c:1437)
-==2494118==    by 0x51B3239: make_request (check_pf.c:235)
-==2494118==    by 0x51B3239: __check_pf (check_pf.c:329)
-==2494118==    by 0x5181B28: getaddrinfo (getaddrinfo.c:2320)
-==2494118==    by 0x401F3C: get_server_address (serverutils.c:50)
-==2494118==    by 0x402089: bind_and_listen (serverutils.c:100)
-==2494118==    by 0x401E00: main (simpleserver.c:324)
-==2494118== 
-==2494118== 5,440 bytes in 20 blocks are possibly lost in loss record 9 of 9
-==2494118==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
-==2494118==    by 0x40152F2: UnknownInlinedFun (rtld-malloc.h:44)
-==2494118==    by 0x40152F2: allocate_dtv (dl-tls.c:371)
-==2494118==    by 0x4015D21: _dl_allocate_tls (dl-tls.c:629)
-==2494118==    by 0x4E50E32: allocate_stack (allocatestack.c:623)
-==2494118==    by 0x4E50E32: pthread_create@@GLIBC_2.2.5 (pthread_create.c:662)
-==2494118==    by 0x40161F: ThreadPoolStart (threadpool.h:54)
-==2494118==    by 0x401E19: main (simpleserver.c:326)
-==2494118== 
-==2494118== LEAK SUMMARY:
-==2494118==    definitely lost: 0 bytes in 0 blocks
-==2494118==    indirectly lost: 0 bytes in 0 blocks
-==2494118==      possibly lost: 5,440 bytes in 20 blocks
-==2494118==    still reachable: 2,827 bytes in 8 blocks
-==2494118==         suppressed: 0 bytes in 0 blocks
-==2494118== 
-==2494118== For lists of detected and suppressed errors, rerun with: -s
-==2494118== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==2496902== Memcheck, a memory error detector
+==2496902== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==2496902== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==2496902== Command: bin/simpleserver 8080 files
+==2496902== Parent PID: 2496901
+==2496902== 
+==2496902== 
+==2496902== Process terminating with default action of signal 2 (SIGINT)
+==2496902==    at 0x4E59BD7: accept (accept.c:26)
+==2496902==    by 0x401BC6: handle_connections (simpleserver.c:224)
+==2496902==    by 0x401E49: main (simpleserver.c:338)
+==2496902== 
+==2496902== HEAP SUMMARY:
+==2496902==     in use at exit: 8,278 bytes in 30 blocks
+==2496902==   total heap usage: 34 allocs, 4 frees, 8,954 bytes allocated
+==2496902== 
+==2496902== 5 bytes in 1 blocks are still reachable in loss record 1 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x510768D: strdup (strdup.c:42)
+==2496902==    by 0x401DD5: main (simpleserver.c:328)
+==2496902== 
+==2496902== 5 bytes in 1 blocks are still reachable in loss record 2 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x510768D: strdup (strdup.c:42)
+==2496902==    by 0x401E9D: server_create (serverutils.c:20)
+==2496902==    by 0x401E0F: main (simpleserver.c:333)
+==2496902== 
+==2496902== 6 bytes in 1 blocks are still reachable in loss record 3 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x510768D: strdup (strdup.c:42)
+==2496902==    by 0x401DEC: main (simpleserver.c:329)
+==2496902== 
+==2496902== 6 bytes in 1 blocks are still reachable in loss record 4 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x510768D: strdup (strdup.c:42)
+==2496902==    by 0x401EBD: server_create (serverutils.c:22)
+==2496902==    by 0x401E0F: main (simpleserver.c:333)
+==2496902== 
+==2496902== 24 bytes in 1 blocks are still reachable in loss record 5 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x401397: QueueInit (queue.h:27)
+==2496902==    by 0x401D65: startup (simpleserver.c:311)
+==2496902==    by 0x401DFA: main (simpleserver.c:331)
+==2496902== 
+==2496902== 24 bytes in 1 blocks are still reachable in loss record 6 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x40155B: ThreadPoolInit (threadpool.h:39)
+==2496902==    by 0x401D7B: startup (simpleserver.c:312)
+==2496902==    by 0x401DFA: main (simpleserver.c:331)
+==2496902== 
+==2496902== 24 bytes in 1 blocks are still reachable in loss record 7 of 11
+==2496902==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2496902==    by 0x401E8D: server_create (serverutils.c:18)
+==2496902==    by 0x401E0F: main (simpleserver.c:333)
+==2496902== 
+==2496902== 160 bytes in 1 blocks are still reachable in loss record 8 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x401577: ThreadPoolInit (threadpool.h:42)
+==2496902==    by 0x401D7B: startup (simpleserver.c:312)
+==2496902==    by 0x401DFA: main (simpleserver.c:331)
+==2496902== 
+==2496902== 1,024 bytes in 1 blocks are still reachable in loss record 9 of 11
+==2496902==    at 0x4C38135: malloc (vg_replace_malloc.c:381)
+==2496902==    by 0x50EDD3F: _IO_file_doallocate (filedoalloc.c:101)
+==2496902==    by 0x50FBCAF: _IO_doallocbuf (genops.c:347)
+==2496902==    by 0x50FAF17: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:749)
+==2496902==    by 0x50FA0BE: UnknownInlinedFun (fileops.c:1248)
+==2496902==    by 0x50FA0BE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1201)
+==2496902==    by 0x50F0182: puts (ioputs.c:40)
+==2496902==    by 0x40213F: bind_and_listen (serverutils.c:116)
+==2496902==    by 0x401E1F: main (simpleserver.c:334)
+==2496902== 
+==2496902== 1,560 bytes in 1 blocks are still reachable in loss record 10 of 11
+==2496902==    at 0x4C3804F: malloc (vg_replace_malloc.c:380)
+==2496902==    by 0x4C3D0F2: realloc (vg_replace_malloc.c:1437)
+==2496902==    by 0x51B3239: make_request (check_pf.c:235)
+==2496902==    by 0x51B3239: __check_pf (check_pf.c:329)
+==2496902==    by 0x5181B28: getaddrinfo (getaddrinfo.c:2320)
+==2496902==    by 0x401F5B: get_server_address (serverutils.c:50)
+==2496902==    by 0x4020A8: bind_and_listen (serverutils.c:100)
+==2496902==    by 0x401E1F: main (simpleserver.c:334)
+==2496902== 
+==2496902== 5,440 bytes in 20 blocks are possibly lost in loss record 11 of 11
+==2496902==    at 0x4C3CE4B: calloc (vg_replace_malloc.c:1328)
+==2496902==    by 0x40152F2: UnknownInlinedFun (rtld-malloc.h:44)
+==2496902==    by 0x40152F2: allocate_dtv (dl-tls.c:371)
+==2496902==    by 0x4015D21: _dl_allocate_tls (dl-tls.c:629)
+==2496902==    by 0x4E50E32: allocate_stack (allocatestack.c:623)
+==2496902==    by 0x4E50E32: pthread_create@@GLIBC_2.2.5 (pthread_create.c:662)
+==2496902==    by 0x4015DF: ThreadPoolStart (threadpool.h:54)
+==2496902==    by 0x401E38: main (simpleserver.c:336)
+==2496902== 
+==2496902== LEAK SUMMARY:
+==2496902==    definitely lost: 0 bytes in 0 blocks
+==2496902==    indirectly lost: 0 bytes in 0 blocks
+==2496902==      possibly lost: 5,440 bytes in 20 blocks
+==2496902==    still reachable: 2,838 bytes in 10 blocks
+==2496902==         suppressed: 0 bytes in 0 blocks
+==2496902== 
+==2496902== For lists of detected and suppressed errors, rerun with: -s
+==2496902== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
