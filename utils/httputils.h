@@ -39,7 +39,7 @@ extern void free_http_request(request_t* req); // frees a given HTTP_Request str
 extern response_t* new_http_response();              // returns pointer to a new http response
 extern void free_http_response(response_t *res); // frees a given HTTP_Request struct and its members
 extern int set_http_response_header(response_t *res, const char *header, char *data);
-extern void set_http_response_body(response_t *res, const char *data, size_t size);
+extern void set_http_response_body(response_t *res, const unsigned char *data, size_t size);
 extern char* create_http_response_string(response_t *res); // create the string to be sent from the data in the http response
 extern char* get_content_type(char *file_name); // get the MIME type for a given file extension
 #endif // HTTP_UTILS_

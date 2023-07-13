@@ -41,6 +41,7 @@ read_file(char* file_name)
   }
 
 
+
   // Open file
   fp = fopen(file_name, "rb");
   if (fp == NULL)
@@ -52,8 +53,6 @@ read_file(char* file_name)
     return file;
   }
 
-  stat(file_name, &st);
-  file_size = st.st_size;
 
   // Seek to end of file and read how far in
   // to get number of bytes to read
@@ -68,13 +67,17 @@ read_file(char* file_name)
 //    return file;
 //  }
 //  rewind(fp);
+
+  stat(file_name, &st);
+  file_size = st.st_size;
+  file->Name = strdup(file_name);
   fseek(fp, 0L, SEEK_SET);
   
   file->Size = file_size;
 
   // Allocate space in struct 
   // to read from the file
-  file->Data = (char*)calloc(file_size, sizeof(char));
+  file->Data = (unsigned char*)calloc(file_size, sizeof(unsigned char));
   if (file->Data == NULL) 
   {
     fclose(fp);
@@ -102,6 +105,7 @@ read_file(char* file_name)
 void
 free_file(file_t *file)
 {
+  free(file->Name);
   free(file->Data);
   free(file);
 }

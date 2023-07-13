@@ -71,17 +71,17 @@ sigchld_handler(int s) {
 // Receive a message from specified file descriptor
 char*
 receive(int fd) {
-
-  char *buffer = (char*)calloc(1024, sizeof(char));
+  size_t bufsize = 2048;
+  char *buffer = (char*)calloc(bufsize, sizeof(char));
   if (buffer <= 0) return NULL;
 
   int bytes_read = 0;
   int total = 0;
 
-  while (bytes_read = recv(fd, buffer+total, 1024, 0), bytes_read == 1024)
+  while (bytes_read = recv(fd, buffer+total, bufsize, 0), bytes_read == bufsize)
   {
     total += bytes_read;
-    char* reallocated = (char*)realloc(buffer, 1024 + total);
+    char* reallocated = (char*)realloc(buffer, bufsize + total);
 
     if (reallocated <= 0)
     {
@@ -90,7 +90,7 @@ receive(int fd) {
     }
 
     buffer = reallocated;
-    memset(buffer + total, 0, 1024);
+    memset(buffer + total, 0, bufsize);
   }
 
 //    int valread = recv(fd, buffer, 1024, 0);

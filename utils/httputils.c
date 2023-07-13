@@ -72,7 +72,7 @@ free_http_response(response_t *res)
 // Create the body of the response
 // from the desired data
   body_t
-create_response_body(const char *data, size_t size)
+create_response_body(const unsigned char *data, size_t size)
 {
   body_t b;
 
@@ -90,7 +90,7 @@ create_response_body(const char *data, size_t size)
 // Set the body of http response
 // to desired data
 void
-set_http_response_body(response_t *res, const char *data, size_t size)
+set_http_response_body(response_t *res, const unsigned char *data, size_t size)
 {
   body_t body;
   char content_length[32];

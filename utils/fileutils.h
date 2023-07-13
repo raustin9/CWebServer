@@ -5,7 +5,8 @@
 #include <stdlib.h>
 
 typedef struct File {
-  char *Data;
+  char *Name;  // name of the file
+  unsigned char *Data;  // the content of the file in bytes
   size_t Size;
 } file_t;
 
