@@ -132,6 +132,25 @@ validate_uri(request_t *req)
 void
 process_request(const server_t *server, int sockfd, int conn_fd, char *request) 
 {
+  if (strcmp(request, "") == 0) 
+  {
+    response_t *res = new_http_response();
+    unsigned char *resp_str = (unsigned char*)strdup("ping");
+    set_http_response_header(res, "Status", "200 OK");
+    set_http_response_header(res, "Content-Type", "text/plain");
+    set_http_response_body(res, resp_str, 4);
+    char *response_string = create_http_response_string(res);
+
+    if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
+    {
+      perror("send_data");
+    }
+    free(resp_str);
+    free(response_string);
+    free_http_response(res);
+    return;
+  }
+
   request_t *req = new_http_request(request);
   response_t *res = new_http_response();
 
@@ -154,6 +173,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
 
+      // printf("sending on %d\n", conn_fd);
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
@@ -180,6 +200,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
  
+      // printf("sending on %d\n", conn_fd);
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
       {
         perror("send_data");
@@ -233,13 +254,16 @@ handle_connections(server_t *server, int sockfd) {
         s,
         sizeof(s));
     printf("server: got connection from %s\n", s);
+    int *n_fd = malloc(sizeof(int));
  
     pthread_mutex_lock(&mutex);
-    QueuePush(queue, (void*)&new_fd);
+    *n_fd = new_fd;
+    QueuePush(queue, (void*)n_fd);
     pthread_cond_signal(&condition_var);
     pthread_mutex_unlock(&mutex);
-
-    /* // FOR FORKING PROCESSES
+    
+   /*
+    // FOR FORKING PROCESSES
     // Receive message from connection
     char* request = receive(new_fd);
     if (request == NULL) {
@@ -257,14 +281,15 @@ handle_connections(server_t *server, int sockfd) {
       exit(0);
     }
     close(new_fd);
-    free(request);
-    */ 
+    free(request); 
+     */
   }
 }
 
 void*
 thread_function(void* args)
 {
+  // pthread_t self = pthread_self();
   server_t *server = (server_t*)args;
   while(1)
   {
@@ -285,21 +310,20 @@ thread_function(void* args)
     if (node != NULL)
     {
       // logic for request
-      int fd = *(int*)node->Data;
-      char *request = receive(fd);
+      // int fd = *(int*)node->Data;
+      int *fd = (int*)node->Data;
+      // printf("%lu -- fd: %d\n", self,  *fd);
+      char *request = receive(*fd);
       if (request == NULL)
       {
         perror("webserver (receive)");
         continue;
       }
-
-      process_request(server, 0, fd, request);
+      process_request(server, 0, *fd, request);
       free(request);
       free(node);
-      node = NULL;
-
-      shutdown(fd, SHUT_RDWR);
-      close(fd);
+      // printf("closing %d\n", *fd);
+      close(*fd);
     }
   }
   return NULL;
