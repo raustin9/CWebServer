@@ -1,8 +1,0 @@
-IMPORTANT NOTES:
-These are all for thread-pool version of server
-For now these are also all coming from localhost, so it will be quicker than real internet connection
-
--- June 28, 2023 --
-Time for 500 requests: ~1.61 seconds total
-Time per request:      ~0.00322 seconds per request
-Requests per second:   ~310.55 requests per second
