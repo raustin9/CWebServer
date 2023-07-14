@@ -254,9 +254,9 @@ handle_connections(server_t *server, int sockfd) {
         s,
         sizeof(s));
     printf("server: got connection from %s\n", s);
-    int *n_fd = malloc(sizeof(int));
  
     pthread_mutex_lock(&mutex);
+    int *n_fd = malloc(sizeof(int));
     *n_fd = new_fd;
     QueuePush(queue, (void*)n_fd);
     pthread_cond_signal(&condition_var);
@@ -291,6 +291,7 @@ thread_function(void* args)
 {
   // pthread_t self = pthread_self();
   server_t *server = (server_t*)args;
+  int fd;
   while(1)
   {
     qnode_t *node;
@@ -309,21 +310,24 @@ thread_function(void* args)
     // handle it
     if (node != NULL)
     {
+      pthread_mutex_lock(&mutex);
+      fd = *(int*)node->Data;
+      free(node->Data);
+      pthread_mutex_unlock(&mutex);
       // logic for request
       // int fd = *(int*)node->Data;
-      int *fd = (int*)node->Data;
       // printf("%lu -- fd: %d\n", self,  *fd);
-      char *request = receive(*fd);
+      char *request = receive(fd);
       if (request == NULL)
       {
         perror("webserver (receive)");
         continue;
       }
-      process_request(server, 0, *fd, request);
+      process_request(server, 0, fd, request);
       free(request);
       free(node);
-      // printf("closing %d\n", *fd);
-      close(*fd);
+      // printf("closing %d\n", fd);
+      close(fd);
     }
   }
   return NULL;
