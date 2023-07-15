@@ -301,3 +301,26 @@ get_content_type(char* file_name) {
   free(file_extension);
   return content_type;
 }
+
+// Validate the request URI
+// Return 1 if they are requesting "/"
+// Return 2 if they are requesting an API call
+// Return 3 if they are requesting a file
+int
+validate_uri(request_t *req)
+{
+  int result;
+
+  if (strcmp(req->URI, "/") == 0) {
+    // Assume it is browser asking for index.html
+    result = 1;
+  } else if (strcmp(req->URI, "/api") == 0) {
+    // API call rather than file request
+    result = 2;
+  } else {
+    // Assume it is file request
+    result = 3;
+  }
+
+  return result;
+}

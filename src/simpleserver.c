@@ -87,28 +87,6 @@ receive_request(int fd) {
   return buffer;
 }
 
-// Validate the request URI
-// Return 1 if they are requesting "/"
-// Return 2 if they are requesting an API call
-// Return 3 if they are requesting a file
-int
-validate_uri(request_t *req)
-{
-  int result;
-
-  if (strcmp(req->URI, "/") == 0) {
-    // Assume it is browser asking for index.html
-    result = 1;
-  } else if (strcmp(req->URI, "/api") == 0) {
-    // API call rather than file request
-    result = 2;
-  } else {
-    // Assume it is file request
-    result = 3;
-  }
-
-  return result;
-}
 
 // Handle the logic for processing
 // a connection
@@ -214,10 +192,10 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
 // Handle the incoming requests
 void
 serve_on_socket(server_t *server, int sockfd) {
+  int new_fd;                         // accept new connections on this fd
+  char s[INET6_ADDRSTRLEN];           // buffer for IP addresses
   struct sockaddr_storage their_addr; // connector's address information
   socklen_t sin_size;
-  int new_fd; // accept new connections on this fd
-  char s[INET6_ADDRSTRLEN]; // buffer for IP addresses
 
   sin_size = sizeof(their_addr);
   while (1) {
@@ -235,6 +213,8 @@ serve_on_socket(server_t *server, int sockfd) {
     );
     printf("server: got connection from %s\n", s);
  
+    // push the file descriptor of received connection
+    // onto the queue for a worker thread to grab
     pthread_mutex_lock(&mutex);
       int *n_fd = malloc(sizeof(int));
       *n_fd = new_fd;
@@ -304,9 +284,11 @@ startup()
 int
 main(int argc, char** argv) {
   int sockfd;        // file descriptor to listen on 
+  int backlog = 20;  // backlog of connections to queue
   server_t *server;  // Server details
   char *port;        // port to serve on
   char *file_source; // directory source of the files to serve
+
   
   if (argc < 3)
   {
@@ -319,7 +301,7 @@ main(int argc, char** argv) {
 
   (void)startup();
 
-  server = server_create(port, 20, file_source);
+  server = server_create(port, backlog, file_source);
   sockfd = bind_and_listen(server);
 
   (void)ThreadPoolStart(thread_pool, (void*)server);

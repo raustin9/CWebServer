@@ -42,4 +42,5 @@ extern int set_http_response_header(response_t *res, const char *header, char *d
 extern void set_http_response_body(response_t *res, const unsigned char *data, size_t size);
 extern char* create_http_response_string(response_t *res); // create the string to be sent from the data in the http response
 extern char* get_content_type(char *file_name); // get the MIME type for a given file extension
+extern int validate_uri(request_t *req); // return what type of data the URI is requesting
 #endif // HTTP_UTILS_
