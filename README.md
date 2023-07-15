@@ -16,11 +16,13 @@ Incoming connections are put on a queue, and when a thread is available, it will
 
 ## How to run
 At the moment, the current build system is Make.
-To build the multithreaded version run: ```make multi```
-To build the thread-pool version run: ```make pool```
-To build both versions run ```make all``` or ```make```
 
-After building, there will be executables of your desired version in the ```bin``` directory.
-To run the version you want, just run the command ```bin/poolserver``` or ```bin/multiserver```
+There are 3 different executables:
+socket.c
+simpleserver.c
+jfslkdjjfsd.c
 
-THERE IS NO EXIT OTHER THAN KILLING THE PROCESS AT THE CURRENT TIME
+The default Make rule is to make all the executables, but to 
+only build the server just use ```make server```
+
+THE ONLY WAY TO KILL THE SERVER IS TO INTERRUPT IT
