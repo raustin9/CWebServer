@@ -18,8 +18,6 @@
 #include "queue.h"
 #include "threadpool.h"
 
-#define THREAD_POOL_SIZE 20
-
 // Globals
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condition_var = PTHREAD_COND_INITIALIZER;
@@ -37,6 +35,7 @@ get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+
 // Ensure all data in the buffer is sent
 int
 send_data(int conn_fd, char *data, size_t *len)
@@ -45,7 +44,8 @@ send_data(int conn_fd, char *data, size_t *len)
 
   total = 0;
   bytes_left = *len;
-  
+ 
+  // continue to send data until all data has been sent
   while (total < *len) 
   {
     n = send(conn_fd, data+total, bytes_left, 0);
@@ -58,19 +58,9 @@ send_data(int conn_fd, char *data, size_t *len)
   return (n == -1) ? (-1) : (0); // return -1 on failure, 0 on success
 }
 
-// Clean up zombie processes
-void
-sigchld_handler(int s) {
-  int saved_errno = errno;
-
-  while (waitpid(-1, NULL, WNOHANG) > 0);
-
-  errno = saved_errno;
-}
-
-// Receive a message from specified file descriptor
+// Receive a request from specified file descriptor
 char*
-receive(int fd) {
+receive_request(int fd) {
   size_t bufsize = 2048;
   char *buffer = (char*)calloc(bufsize, sizeof(char));
   if (buffer <= 0) return NULL;
@@ -78,6 +68,7 @@ receive(int fd) {
   int bytes_read = 0;
   int total = 0;
 
+  // continuously read from the file descriptor until all data has been read
   while (bytes_read = recv(fd, buffer+total, bufsize, 0), bytes_read == bufsize)
   {
     total += bytes_read;
@@ -93,15 +84,7 @@ receive(int fd) {
     memset(buffer + total, 0, bufsize);
   }
 
-//    int valread = recv(fd, buffer, 1024, 0);
-//    if (valread == -1) {
-//      free(buffer);
-//      perror("recv");
-//      // close(fd);
-//      return NULL;
-//    }
-
-    return buffer;
+  return buffer;
 }
 
 // Validate the request URI
@@ -132,8 +115,14 @@ validate_uri(request_t *req)
 void
 process_request(const server_t *server, int sockfd, int conn_fd, char *request) 
 {
-  if (strcmp(request, "") == 0) 
-  {
+  request_t *req;
+  response_t *res;
+  char *response_string;
+  file_t *file;
+  char *file_name, *file_path, *content_type;
+
+  // If request is empty
+  if (strcmp(request, "") == 0) {
     response_t *res = new_http_response();
     unsigned char *resp_str = (unsigned char*)strdup("ping");
     set_http_response_header(res, "Status", "200 OK");
@@ -151,17 +140,16 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
     return;
   }
 
-  request_t *req = new_http_request(request);
-  response_t *res = new_http_response();
+  // Parse the incoming request and create our response
+  req = new_http_request(request);
+  res = new_http_response();
 
-  char *response_string;
-  file_t *file;
-  char *file_name, *file_path, *content_type;
-  // char *file_path = strdup("files/");
-
+  // Determine what the desired URI is
+  // i.e. /app.css vs /api/...
   switch (validate_uri(req))
   {
     case 1:
+      // "/"
       // Respond with index.html
       file_name = strdup("index.html");
       file_path = create_file_path(server->File_Source, file_name);
@@ -173,9 +161,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
 
-      // printf("sending on %d\n", conn_fd);
-      if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
-      {
+      if (send_data(conn_fd, response_string, &res->String_Size) == -1) {
         perror("send_data");
       }
 
@@ -184,12 +170,15 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       free(file_path);
       free(content_type);
       break;
+
     case 2:
+      // TODO: create REST API
       response_string = create_http_response_string(res);
-      // API calll
       break;
+
     case 3:
-      // Respond with requested file
+      // "/requested_file"
+      // Respond with the requested file
       file_name = get_file_name(req->URI);
       file_path = create_file_path(server->File_Source, file_name);
       file = read_file(file_path);
@@ -200,9 +189,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       set_http_response_body(res, file->Data, file->Size);
       response_string = create_http_response_string(res);
  
-      // printf("sending on %d\n", conn_fd);
-      if (send_data(conn_fd, response_string, &res->String_Size) == -1) 
-      {
+      if (send_data(conn_fd, response_string, &res->String_Size) == -1) {
         perror("send_data");
       }
 
@@ -211,8 +198,10 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       free(file_path);
       free(content_type);
       break;
+
     default:
-      // wtf
+      // some shit fucked up
+      response_string = strdup("wtf");
       break;
   }
 
@@ -224,24 +213,14 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
 
 // Handle the incoming requests
 void
-handle_connections(server_t *server, int sockfd) {
+serve_on_socket(server_t *server, int sockfd) {
   struct sockaddr_storage their_addr; // connector's address information
   socklen_t sin_size;
-  struct sigaction sa;
   int new_fd; // accept new connections on this fd
   char s[INET6_ADDRSTRLEN]; // buffer for IP addresses
 
-  sa.sa_handler = sigchld_handler; // reap all zombie processes
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = SA_RESTART;
-  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    perror("sigaction");
-    exit(1);
-  }
-
-
+  sin_size = sizeof(their_addr);
   while (1) {
-    sin_size = sizeof(their_addr);
     new_fd = accept(sockfd, (struct sockaddr*)&their_addr, &sin_size);
     if (new_fd == -1) {
       perror("accept");
@@ -250,53 +229,33 @@ handle_connections(server_t *server, int sockfd) {
 
     // Get the "presentation" form of the client IP
     inet_ntop(their_addr.ss_family,
-        get_in_addr((struct sockaddr*)&their_addr),
-        s,
-        sizeof(s));
+      get_in_addr((struct sockaddr*)&their_addr),
+      s,
+      sizeof(s)
+    );
     printf("server: got connection from %s\n", s);
  
     pthread_mutex_lock(&mutex);
-    int *n_fd = malloc(sizeof(int));
-    *n_fd = new_fd;
-    QueuePush(queue, (void*)n_fd);
-    pthread_cond_signal(&condition_var);
+      int *n_fd = malloc(sizeof(int));
+      *n_fd = new_fd;
+      QueuePush(queue, (void*)n_fd);
+      pthread_cond_signal(&condition_var);
     pthread_mutex_unlock(&mutex);
-    
-   /*
-    // FOR FORKING PROCESSES
-    // Receive message from connection
-    char* request = receive(new_fd);
-    if (request == NULL) {
-      continue;
-    }
-    // printf("%s", request);
-
-    if (fork() == 0) {
-      // Child process
-      close(sockfd);
-      process_request(server, sockfd, new_fd, request);
-      server_free(server);
-      free(request);
-      close(new_fd);
-      exit(0);
-    }
-    close(new_fd);
-    free(request); 
-     */
   }
 }
 
+// Logic for the worker threads
 void*
 thread_function(void* args)
 {
   // pthread_t self = pthread_self();
   server_t *server = (server_t*)args;
-  int fd;
+  int conn_fd;
+  qnode_t *node;
+  node = NULL;
+ 
   while(1)
   {
-    qnode_t *node;
-    node = NULL;
-
     // Wait for connection to get pushed on the queue
     pthread_mutex_lock(&mutex);
     if ((node = QueuePop(queue)) == NULL)
@@ -306,56 +265,58 @@ thread_function(void* args)
     }
     pthread_mutex_unlock(&mutex);
 
-    // If it got a connection
-    // handle it
+    // Handle connection if it grabbed one
     if (node != NULL)
     {
+      // Grab the connection file descriptor
       pthread_mutex_lock(&mutex);
-      fd = *(int*)node->Data;
+      conn_fd = *(int*)node->Data;
       free(node->Data);
       pthread_mutex_unlock(&mutex);
+ 
       // logic for request
-      // int fd = *(int*)node->Data;
-      // printf("%lu -- fd: %d\n", self,  *fd);
-      char *request = receive(fd);
+      char *request = receive_request(conn_fd);
       if (request == NULL)
       {
         perror("webserver (receive)");
         continue;
       }
-      process_request(server, 0, fd, request);
+
+      process_request(server, 0, conn_fd, request);
       free(request);
       free(node);
-      // printf("closing %d\n", fd);
-      close(fd);
+      close(conn_fd);
     }
   }
   return NULL;
 }
 
+// Startup behavior for the server
 void
 startup()
 {
+  int num_threads = 15;
   queue = QueueInit();
-  thread_pool = ThreadPoolInit(THREAD_POOL_SIZE, thread_function);
+  thread_pool = ThreadPoolInit(num_threads, thread_function);
 
 }
 
 int
 main(int argc, char** argv) {
-  int sockfd;       // file descriptor to listen on 
-  server_t *server; // Server details
-  char *port, *file_source;
+  int sockfd;        // file descriptor to listen on 
+  server_t *server;  // Server details
+  char *port;        // port to serve on
+  char *file_source; // directory source of the files to serve
   
   if (argc < 3)
   {
-    fprintf(stderr, "usage: <port> <dir_source>\n");
+    fprintf(stderr, "usage: <port> <source_directory>\n");
     return 1;
   }
 
-  port = strdup(argv[1]);
-  file_source = strdup(argv[2]);
- 
+  port = argv[1];
+  file_source = argv[2];
+
   (void)startup();
 
   server = server_create(port, 20, file_source);
@@ -363,8 +324,9 @@ main(int argc, char** argv) {
 
   (void)ThreadPoolStart(thread_pool, (void*)server);
 
-  (void)handle_connections(server, sockfd); // handle connections on the socket
+  (void)serve_on_socket(server, sockfd); // handle connections on the socket
 
+  // lmao it should never get here
   server_free(server);
   QueueFree(queue);
   return 0;

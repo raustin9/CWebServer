@@ -1,79 +1,69 @@
-==9202== Memcheck, a memory error detector
-==9202== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==9202== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
-==9202== Command: bin/simpleserver 8080 files
-==9202== Parent PID: 9201
-==9202== 
-==9202== 
-==9202== Process terminating with default action of signal 2 (SIGINT)
-==9202==    at 0x486B4FF: accept (accept.c:26)
-==9202==    by 0x10B074: handle_connections (simpleserver.c:245)
-==9202==    by 0x10B34C: main (simpleserver.c:366)
-==9202== 
-==9202== HEAP SUMMARY:
-==9202==     in use at exit: 5,694 bytes in 28 blocks
-==9202==   total heap usage: 982 allocs, 954 frees, 137,606,366 bytes allocated
-==9202== 
-==9202== 5 bytes in 1 blocks are still reachable in loss record 1 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x491A38E: strdup (strdup.c:42)
-==9202==    by 0x10B2D8: main (simpleserver.c:356)
-==9202== 
-==9202== 5 bytes in 1 blocks are still reachable in loss record 2 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x491A38E: strdup (strdup.c:42)
-==9202==    by 0x10B3A4: server_create (serverutils.c:20)
-==9202==    by 0x10B312: main (simpleserver.c:361)
-==9202== 
-==9202== 6 bytes in 1 blocks are still reachable in loss record 3 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x491A38E: strdup (strdup.c:42)
-==9202==    by 0x10B2EF: main (simpleserver.c:357)
-==9202== 
-==9202== 6 bytes in 1 blocks are still reachable in loss record 4 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x491A38E: strdup (strdup.c:42)
-==9202==    by 0x10B3C4: server_create (serverutils.c:22)
-==9202==    by 0x10B312: main (simpleserver.c:361)
-==9202== 
-==9202== 24 bytes in 1 blocks are still reachable in loss record 5 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x10A6FE: QueueInit (queue.h:27)
-==9202==    by 0x10B260: startup (simpleserver.c:339)
-==9202==    by 0x10B2FD: main (simpleserver.c:359)
-==9202== 
-==9202== 24 bytes in 1 blocks are still reachable in loss record 6 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x10A8D4: ThreadPoolInit (threadpool.h:39)
-==9202==    by 0x10B278: startup (simpleserver.c:340)
-==9202==    by 0x10B2FD: main (simpleserver.c:359)
-==9202== 
-==9202== 24 bytes in 1 blocks are still reachable in loss record 7 of 9
-==9202==    at 0x483DD99: calloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x10B394: server_create (serverutils.c:18)
-==9202==    by 0x10B312: main (simpleserver.c:361)
-==9202== 
-==9202== 160 bytes in 1 blocks are still reachable in loss record 8 of 9
-==9202==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x10A8F0: ThreadPoolInit (threadpool.h:42)
-==9202==    by 0x10B278: startup (simpleserver.c:340)
-==9202==    by 0x10B2FD: main (simpleserver.c:359)
-==9202== 
-==9202== 5,440 bytes in 20 blocks are possibly lost in loss record 9 of 9
-==9202==    at 0x483DD99: calloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==9202==    by 0x40149DA: allocate_dtv (dl-tls.c:286)
-==9202==    by 0x40149DA: _dl_allocate_tls (dl-tls.c:532)
-==9202==    by 0x4861322: allocate_stack (allocatestack.c:622)
-==9202==    by 0x4861322: pthread_create@@GLIBC_2.2.5 (pthread_create.c:660)
-==9202==    by 0x10A95C: ThreadPoolStart (threadpool.h:54)
-==9202==    by 0x10B33B: main (simpleserver.c:364)
-==9202== 
-==9202== LEAK SUMMARY:
-==9202==    definitely lost: 0 bytes in 0 blocks
-==9202==    indirectly lost: 0 bytes in 0 blocks
-==9202==      possibly lost: 5,440 bytes in 20 blocks
-==9202==    still reachable: 254 bytes in 8 blocks
-==9202==         suppressed: 0 bytes in 0 blocks
-==9202== 
-==9202== For lists of detected and suppressed errors, rerun with: -s
-==9202== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==2916== Memcheck, a memory error detector
+==2916== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2916== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==2916== Command: bin/simpleserver 8080 files
+==2916== Parent PID: 2915
+==2916== 
+==2916== 
+==2916== Process terminating with default action of signal 2 (SIGINT)
+==2916==    at 0x486B4FF: accept (accept.c:26)
+==2916==    by 0x10AF69: serve_on_socket (simpleserver.c:224)
+==2916==    by 0x10B236: main (simpleserver.c:327)
+==2916== 
+==2916== HEAP SUMMARY:
+==2916==     in use at exit: 4,283 bytes in 21 blocks
+==2916==   total heap usage: 975 allocs, 954 frees, 137,604,955 bytes allocated
+==2916== 
+==2916== 5 bytes in 1 blocks are still reachable in loss record 1 of 7
+==2916==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x491A38E: strdup (strdup.c:42)
+==2916==    by 0x10B28E: server_create (serverutils.c:20)
+==2916==    by 0x10B1FC: main (simpleserver.c:322)
+==2916== 
+==2916== 6 bytes in 1 blocks are still reachable in loss record 2 of 7
+==2916==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x491A38E: strdup (strdup.c:42)
+==2916==    by 0x10B2AE: server_create (serverutils.c:22)
+==2916==    by 0x10B1FC: main (simpleserver.c:322)
+==2916== 
+==2916== 24 bytes in 1 blocks are still reachable in loss record 3 of 7
+==2916==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x10A67E: QueueInit (queue.h:27)
+==2916==    by 0x10B160: startup (simpleserver.c:299)
+==2916==    by 0x10B1E7: main (simpleserver.c:320)
+==2916== 
+==2916== 24 bytes in 1 blocks are still reachable in loss record 4 of 7
+==2916==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x10A854: ThreadPoolInit (threadpool.h:39)
+==2916==    by 0x10B178: startup (simpleserver.c:300)
+==2916==    by 0x10B1E7: main (simpleserver.c:320)
+==2916== 
+==2916== 24 bytes in 1 blocks are still reachable in loss record 5 of 7
+==2916==    at 0x483DD99: calloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x10B27E: server_create (serverutils.c:18)
+==2916==    by 0x10B1FC: main (simpleserver.c:322)
+==2916== 
+==2916== 120 bytes in 1 blocks are still reachable in loss record 6 of 7
+==2916==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x10A870: ThreadPoolInit (threadpool.h:42)
+==2916==    by 0x10B178: startup (simpleserver.c:300)
+==2916==    by 0x10B1E7: main (simpleserver.c:320)
+==2916== 
+==2916== 4,080 bytes in 15 blocks are possibly lost in loss record 7 of 7
+==2916==    at 0x483DD99: calloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2916==    by 0x40149DA: allocate_dtv (dl-tls.c:286)
+==2916==    by 0x40149DA: _dl_allocate_tls (dl-tls.c:532)
+==2916==    by 0x4861322: allocate_stack (allocatestack.c:622)
+==2916==    by 0x4861322: pthread_create@@GLIBC_2.2.5 (pthread_create.c:660)
+==2916==    by 0x10A8DC: ThreadPoolStart (threadpool.h:54)
+==2916==    by 0x10B225: main (simpleserver.c:325)
+==2916== 
+==2916== LEAK SUMMARY:
+==2916==    definitely lost: 0 bytes in 0 blocks
+==2916==    indirectly lost: 0 bytes in 0 blocks
+==2916==      possibly lost: 4,080 bytes in 15 blocks
+==2916==    still reachable: 203 bytes in 6 blocks
+==2916==         suppressed: 0 bytes in 0 blocks
+==2916== 
+==2916== For lists of detected and suppressed errors, rerun with: -s
+==2916== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
