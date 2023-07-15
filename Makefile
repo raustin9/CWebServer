@@ -3,10 +3,10 @@ CFLAGS=-Wall -g -Iutils -Iinclude -pthread
 BIN=bin/
 SRC=src/
 OBJS=obj/serverutils.o
-EXECUTABLES=bin/showip bin/socket bin/simpleserver
+EXECUTABLES=bin/webserver
 SHOWIP=showip
 SOCKET=socket
-SERVER=simpleserver
+SERVER=webserver
 LIB=lib/serverutils.a lib/httputils.a lib/fileutils.a
 
 all: $(EXECUTABLES)
