@@ -87,6 +87,32 @@ receive_request(int fd) {
   return buffer;
 }
 
+void
+process_file_request(response_t *res, char* file_path)
+{
+  file_t *file;
+  char *content_type;
+
+  file = read_file(file_path);
+  if (file == NULL) {
+    // error when reading file
+    content_type = strdup("text/plain");
+    set_http_response_header(res, "Status", "404 Not Found");
+    set_http_response_header(res, "Content-Type", content_type);
+    set_http_response_body(res, (unsigned char*)strdup("NOT FOUND"), strlen("NOT FOUND"));
+  } else {
+    content_type = get_content_type(file_path);
+
+    set_http_response_header(res, "Status", "200 OK");
+    set_http_response_header(res, "Content-Type", content_type);
+    set_http_response_body(res, file->Data, file->Size);
+  }
+
+  free_file(file);
+  free(content_type);
+  
+  return;
+}
 
 // Handle the logic for processing
 // a connection
@@ -96,8 +122,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
   request_t *req;
   response_t *res;
   char *response_string;
-  file_t *file;
-  char *file_name, *file_path, *content_type;
+  char *file_name, *file_path;
 
   // If request is empty
   if (strcmp(request, "") == 0) {
@@ -131,22 +156,14 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       // Respond with index.html
       file_name = strdup("index.html");
       file_path = create_file_path(server->File_Source, file_name);
-      file = read_file(file_path);
-      content_type = get_content_type(file_name);
-      
-      set_http_response_header(res, "Status", "200 OK");
-      set_http_response_header(res, "Content-Type", content_type);
-      set_http_response_body(res, file->Data, file->Size);
+ 
+      process_file_request(res, file_path);
       response_string = create_http_response_string(res);
-
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) {
         perror("send_data");
       }
-
-      free_file(file);
       free(file_name);
       free(file_path);
-      free(content_type);
       break;
 
     case 2:
@@ -159,22 +176,15 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       // Respond with the requested file
       file_name = get_file_name(req->URI);
       file_path = create_file_path(server->File_Source, file_name);
-      file = read_file(file_path);
-      content_type = get_content_type(file_name);
- 
-      set_http_response_header(res, "Status", "200 OK");
-      set_http_response_header(res, "Content-Type", content_type);
-      set_http_response_body(res, file->Data, file->Size);
+     
+      process_file_request(res, file_path);
       response_string = create_http_response_string(res);
- 
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) {
         perror("send_data");
       }
 
-      free_file(file);
       free(file_name);
       free(file_path);
-      free(content_type);
       break;
 
     default:
