@@ -38,8 +38,7 @@ get_in_addr(struct sockaddr *sa) {
 
 // Ensure all data in the buffer is sent
 int
-send_data(int conn_fd, char *data, size_t *len)
-{
+send_data(int conn_fd, char *data, size_t *len) {
   int total, bytes_left, n;
 
   total = 0;
@@ -97,14 +96,17 @@ process_file_request(response_t *res, char* file_path)
   if (file == NULL) {
     // error when reading file
     content_type = strdup("text/plain");
-    set_http_response_header(res, "Status", "404 Not Found");
+    // set_http_response_header(res, "Status", "404 Not Found");
+    set_http_response_status(res, 200);
     set_http_response_header(res, "Content-Type", content_type);
     set_http_response_body(res, (unsigned char*)strdup("NOT FOUND"), strlen("NOT FOUND"));
   } else {
     content_type = get_content_type(file_path);
 
-    set_http_response_header(res, "Status", "200 OK");
-    set_http_response_header(res, "Content-Type", content_type);
+    // set;_http_response_header(res, "Status", "200 OK");
+    set_http_response_status(res, 200);
+    set_http_response_content_type(res, content_type);
+    // set_http_response_header(res, "Content-Type", content_type);
     set_http_response_body(res, file->Data, file->Size);
   }
 
@@ -128,7 +130,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
   if (strcmp(request, "") == 0) {
     response_t *res = new_http_response();
     unsigned char *resp_str = (unsigned char*)strdup("ping");
-    set_http_response_header(res, "Status", "200 OK");
+    set_http_response_status(res, 200);
     set_http_response_header(res, "Content-Type", "text/plain");
     set_http_response_body(res, resp_str, 4);
     char *response_string = create_http_response_string(res);
@@ -162,6 +164,7 @@ process_request(const server_t *server, int sockfd, int conn_fd, char *request)
       if (send_data(conn_fd, response_string, &res->String_Size) == -1) {
         perror("send_data");
       }
+ 
       free(file_name);
       free(file_path);
       break;
@@ -295,13 +298,12 @@ int
 main(int argc, char** argv) {
   int sockfd;        // file descriptor to listen on 
   int backlog = 20;  // backlog of connections to queue
-  server_t *server;  // Server details
   char *port;        // port to serve on
   char *file_source; // directory source of the files to serve
+  server_t *server;  // Server details
 
   
-  if (argc < 3)
-  {
+  if (argc < 3) {
     fprintf(stderr, "usage: <port> <source_directory>\n");
     return 1;
   }

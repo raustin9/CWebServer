@@ -324,3 +324,46 @@ validate_uri(request_t *req)
 
   return result;
 }
+
+// Set the status code of an HTTP response 
+// to the desired code
+int
+set_http_response_status(response_t *res, int status_code)
+{
+  char *status_string;
+  switch(status_code)
+  {
+    case 200:
+      status_string = strdup("200 OK");
+      break;
+
+    case 404:
+      status_string = strdup("404 Not Found");
+      break;
+
+    default:
+      status_string = strdup("500 Intenal Server Error");
+      break;
+  }
+
+  res->Headers.Status = strdup(status_string);
+  free(status_string);
+
+  return (res->Headers.Status != NULL) ? 1 : -1;
+}
+
+// Set the Content-Type header on an http response
+int
+set_http_response_content_type(response_t *res, char *content_type)
+{
+  // Validate content_type
+  if (content_type == NULL)
+  {
+    res->Headers.Content_Type = strdup("text/plain");
+    return -1;
+  }
+
+  res->Headers.Content_Type = strdup(content_type);
+
+  return (res->Headers.Content_Type == NULL) ? 1 : -1;
+}
